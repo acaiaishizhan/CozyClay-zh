@@ -158,7 +158,7 @@ export function useCast(appContext) {
 		const id = nextCharacterId(characters);
 		editCharacters((list) => [...list, createCharacterEntry({ id, model, x, z, pose: DEFAULT_POSE, subject: "a person" }, list.length)]);
 		appContext.shared.setSelectedHierarchyId(`character:${id}`);
-		appContext.notify(ko("Character added to the scene", "인물을 씬에 추가했어요"));
+		appContext.notify(ko("Character added to the scene", "인물을 씬에 추가했어요", "已把人物加进场景"));
 	};
 
 	// Viewport picks tag bodies with "A"/"B"/charId and surfaces route the
@@ -209,7 +209,7 @@ export function useCast(appContext) {
 		return new Promise((resolve, reject) => {
 			const timer = setTimeout(() => {
 				appContext.shared.rigWaitersRef.current.delete(charId);
-				reject(new Error(ko("The active character's rig is not loaded", "활성 인물의 리그가 로드되지 않았어요")));
+				reject(new Error(ko("The active character's rig is not loaded", "활성 인물의 리그가 로드되지 않았어요", "当前人物的绑定还没载入")));
 			}, timeoutMs);
 			appContext.shared.rigWaitersRef.current.set(charId, (rig) => {
 				clearTimeout(timer);
@@ -457,7 +457,7 @@ export function useCast(appContext) {
 		const at = frame ?? last.frame + Math.max(8, Math.round((Math.hypot(x - last.x, z - last.z) / WALK_SPEED_MPS) * appContext.shared.tlFps));
 		if (at > lastFrame) {
 			throw studioActionRefusal("INVALID_RANGE", "The path already fills the clip — extend the duration or clear a waypoint.",
-				ko("The path already fills the clip — extend the duration or clear a waypoint", "경로가 이미 클립 길이를 채웠어요. 시간을 늘리거나 웨이포인트를 지워 주세요"));
+				ko("The path already fills the clip — extend the duration or clear a waypoint", "경로가 이미 클립 길이를 채웠어요. 시간을 늘리거나 웨이포인트를 지워 주세요", "路径已经铺满片段了。请加长时间，或清掉一个路径点"));
 		}
 		if (ordered.some((waypoint) => waypoint.frame === at)) {
 			throw studioActionRefusal("INVALID_ARGUMENT", `Frame ${at} already has a root waypoint — pick an empty frame or move that one.`,
@@ -577,11 +577,11 @@ export function useCast(appContext) {
 		setWaypointMode(next);
 		if (!next) {
 			setPendingWaypointFrame(null);
-			appContext.notify(ko("2D Root path constraints off", "2D 루트 경로 제약 꺼짐"));
+			appContext.notify(ko("2D Root path constraints off", "2D 루트 경로 제약 꺼짐", "2D 根路径约束已关"));
 			return;
 		}
 
-		appContext.notify(ko("2D Root path on — click the set floor in the Shot view to drop waypoints; Subject 1 is the frame 0 start", "2D 루트 경로 켜짐 — 샷 뷰의 세트 바닥을 클릭해 웨이포인트를 놓으세요. 인물 1이 0프레임 시작점입니다"));
+		appContext.notify(ko("2D Root path on — click the set floor in the Shot view to drop waypoints; Subject 1 is the frame 0 start", "2D 루트 경로 켜짐 — 샷 뷰의 세트 바닥을 클릭해 웨이포인트를 놓으세요. 인물 1이 0프레임 시작점입니다", "2D 根路径已开 — 在镜头视图的场地地面上点击放置路径点；人物 1 是第 0 帧起点"));
 	}
 
 	function openStudio(charId) {
@@ -622,8 +622,8 @@ export function useCast(appContext) {
 		saveCustomPoses(next);
 		setStudioPick(pose.id);
 		appContext.notify(appContext.shared.motion
-			? ko(`Saved this frame's pose to the library as “${pose.label}”`, `지금 프레임의 자세를 “${pose.label}”로 라이브러리에 저장했어요`)
-			: ko(`Saved the current pose to the library as “${pose.label}”`, `지금 자세를 “${pose.label}”로 라이브러리에 저장했어요`));
+			? ko(`Saved this frame's pose to the library as “${pose.label}”`, `지금 프레임의 자세를 “${pose.label}”로 라이브러리에 저장했어요`, `已将这一帧姿势以“${pose.label}”存入库`)
+			: ko(`Saved the current pose to the library as “${pose.label}”`, `지금 자세를 “${pose.label}”로 라이브러리에 저장했어요`, `已将当前姿势以“${pose.label}”存入库`));
 	}
 
 	function savePose() {
@@ -645,7 +645,7 @@ export function useCast(appContext) {
 		// posed character is, and setPosed only writes when one is being posed.
 		if (posingIndex >= 0) recordCharacterUndo();
 		setPosed(pose);
-		appContext.notify(ko("Pose saved", "포즈 저장됨"));
+		appContext.notify(ko("Pose saved", "포즈 저장됨", "姿势已保存"));
 	}
 
 	/**
@@ -735,8 +735,8 @@ export function useCast(appContext) {
 			// The pose is already saved and written by this point. GVHMR either
 			// returns a measured pose or the named error above reaches the user.
 			appContext.notify(hadMotion
-					? ko("Cleared the motion and posed from the photo — refine it with the handles", "모션을 지우고 사진으로 자세를 잡았어요 — 핸들로 다듬어 보세요")
-					: ko("Pose read from the photo — refine it with the handles", "사진에서 자세를 읽었어요 — 핸들로 다듬어 보세요"));
+					? ko("Cleared the motion and posed from the photo — refine it with the handles", "모션을 지우고 사진으로 자세를 잡았어요 — 핸들로 다듬어 보세요", "已清除动作，并按照片摆好姿势 — 再用手柄微调")
+					: ko("Pose read from the photo — refine it with the handles", "사진에서 자세를 읽었어요 — 핸들로 다듬어 보세요", "已从照片读出姿势 — 用手柄再微调"));
 		} catch (error) {
 			const code = error?.message ?? String(error);
 			// fitLandmarksToPose refuses a sample whose torso is not visible; that is

@@ -1583,7 +1583,7 @@ export default function App() {
 				// A clipboard that carried a file but no supported image (HEIC is
 				// the mainline iPhone case) gets a named rejection, not silence.
 				const carriedFile = Array.from(event.clipboardData?.items ?? []).some((item) => item.kind === "file");
-				if (carriedFile) setToast(ko("That picture format is not supported — use PNG, JPG, WebP or GIF", "지원하지 않는 사진 형식이에요 — PNG, JPG, WebP, GIF만 가능해요"));
+				if (carriedFile) setToast(ko("That picture format is not supported — use PNG, JPG, WebP or GIF", "지원하지 않는 사진 형식이에요 — PNG, JPG, WebP, GIF만 가능해요", "不支持这种图片格式 — 请用 PNG、JPG、WebP 或 GIF"));
 				return;
 			}
 			event.preventDefault();
@@ -1597,6 +1597,7 @@ export default function App() {
 	const rejectUnsupportedDrop = (count) => setToast(ko(
 		`${count} file${count > 1 ? "s" : ""} not supported — use PNG, JPG, WebP, GIF or a .glb / .obj / .fbx (iPhone HEIC photos need converting first)`,
 		`지원하지 않는 파일 ${count}개 — PNG, JPG, WebP, GIF 또는 .glb / .obj / .fbx만 가능해요 (아이폰 HEIC 사진은 먼저 변환해 주세요)`,
+		`${count} 个文件不受支持，请使用 PNG、JPG、WebP、GIF 或 .glb / .obj / .fbx（iPhone HEIC 照片需先转换）`,
 	));
 	const stageDrop = {
 		onImages: (files) => importCutouts(files),
@@ -1747,14 +1748,14 @@ export default function App() {
 			appContext.castHistory.future.push({ tick: charTop.tick, snapshot: snapshotCast(Boolean(charTop.snapshot.shots)) });
 			appContext.castHistory.past.pop();
 			restoreCast(charTop.snapshot);
-			setToast(ko("Undone", "실행 취소됨"));
+			setToast(ko("Undone", "실행 취소됨", "已撤销"));
 			return;
 		}
 		appContext.suppressObjectClock = true;
 		const restored = store.undo();
 		appContext.suppressObjectClock = false;
 		if (restored === null) {
-			setToast(ko("Nothing to undo", "실행 취소할 작업이 없어요"));
+			setToast(ko("Nothing to undo", "실행 취소할 작업이 없어요", "没有可撤销的"));
 			return;
 		}
 		appContext.advanceObjectClock();
@@ -1764,14 +1765,14 @@ export default function App() {
 		} else if (selectedSceneObjectId && !restored.some((object) => object.id === selectedSceneObjectId)) {
 			setSelectedHierarchyId("props");
 		}
-		setToast(ko("Undone", "실행 취소됨"));
+		setToast(ko("Undone", "실행 취소됨", "已撤销"));
 	}
 
 	function undoObjectDeletion() {
 		if (!objectDeleteUndo) return;
 		if (store.depths().past !== objectDeleteUndo.pastDepth) {
 			setObjectDeleteUndo(null);
-			setToast(ko("A newer edit comes after this deletion. Use Undo history instead.", "삭제 이후의 편집이 있어요. 실행 취소 기록을 사용해 주세요."));
+			setToast(ko("A newer edit comes after this deletion. Use Undo history instead.", "삭제 이후의 편집이 있어요. 실행 취소 기록을 사용해 주세요.", "删除之后还有更新的编辑。请改用撤销记录。"));
 			return;
 		}
 		undoScene();
@@ -1784,21 +1785,21 @@ export default function App() {
 			appContext.castHistory.past.push({ tick: charTop.tick, snapshot: snapshotCast(Boolean(charTop.snapshot.shots)) });
 			appContext.castHistory.future.pop();
 			restoreCast(charTop.snapshot);
-			setToast(ko("Redone", "다시 실행됨"));
+			setToast(ko("Redone", "다시 실행됨", "已重做"));
 			return;
 		}
 		appContext.suppressObjectClock = true;
 		const restored = store.redo();
 		appContext.suppressObjectClock = false;
 		if (restored === null) {
-			setToast(ko("Nothing to redo", "다시 실행할 작업이 없어요"));
+			setToast(ko("Nothing to redo", "다시 실행할 작업이 없어요", "没有可重做的"));
 			return;
 		}
 		appContext.advanceObjectClock();
 		if (selectedSceneObjectId && !restored.some((object) => object.id === selectedSceneObjectId)) {
 			setSelectedHierarchyId("props");
 		}
-		setToast(ko("Redone", "다시 실행됨"));
+		setToast(ko("Redone", "다시 실행됨", "已重做"));
 	}
 
 	useEffect(() => {
@@ -2112,7 +2113,7 @@ export default function App() {
 			const stored = await listAssetIds(db);
 			const record = await getAsset(db, id);
 			if (!record) {
-				setToast(ko("That image is no longer in storage", "이 이미지는 이미 저장소에 없습니다"));
+				setToast(ko("That image is no longer in storage", "이 이미지는 이미 저장소에 없습니다", "这张图已经不在仓库里了"));
 				return false;
 			}
 			// Rebuild this at the destructive boundary rather than trusting the
@@ -2122,19 +2123,19 @@ export default function App() {
 			const currentUsageCount = assetUsageCounts(allScenes).get(id) ?? 0;
 			const currentGraphSignature = assetGraphSignature(allScenes);
 			if (expectedUsageCount !== undefined && (!Number.isInteger(expectedUsageCount) || expectedUsageCount !== currentUsageCount)) {
-				setToast(ko("This image's usage changed, so it was not deleted. Please review it again.", "이 이미지의 사용량이 바뀌어서 삭제하지 않았어요. 다시 확인해 주세요."));
+				setToast(ko("This image's usage changed, so it was not deleted. Please review it again.", "이 이미지의 사용량이 바뀌어서 삭제하지 않았어요. 다시 확인해 주세요.", "这张图的用量变了，所以没删。请再看一次。"));
 				return false;
 			}
 			if (expectedGraphSignature !== undefined && expectedGraphSignature !== currentGraphSignature) {
-				setToast(ko("This image's scene references changed, so it was not deleted. Please review it again.", "이 이미지의 씬 참조가 변경되어 삭제하지 않았어요. 다시 확인해 주세요."));
+				setToast(ko("This image's scene references changed, so it was not deleted. Please review it again.", "이 이미지의 씬 참조가 변경되어 삭제하지 않았어요. 다시 확인해 주세요.", "这张图的场景引用变了，所以没删。请再看一次。"));
 				return false;
 			}
 			if (currentUsageCount > 0 && expectedUsageCount === undefined) {
-				setToast(ko("That image is used by a scene and was not deleted", "이 이미지는 씬에서 사용 중이어서 삭제하지 않았어요"));
+				setToast(ko("That image is used by a scene and was not deleted", "이 이미지는 씬에서 사용 중이어서 삭제하지 않았어요", "这张图场景还在用，所以没删"));
 				return false;
 			}
 			if (currentUsageCount === 0 && !unreachableAssetIds(stored, allScenes).includes(id)) {
-				setToast(ko("That image is now used by a scene and was not deleted", "이 이미지는 이제 씬에서 사용 중이어서 삭제하지 않았어요"));
+				setToast(ko("That image is now used by a scene and was not deleted", "이 이미지는 이제 씬에서 사용 중이어서 삭제하지 않았어요", "这张图现在被场景用着，所以没删"));
 				return false;
 			}
 			const authorizedGraph = expectedGraphSignature ?? currentGraphSignature;
@@ -2150,7 +2151,7 @@ export default function App() {
 			});
 			if (!committed) {
 				graphConflict = true;
-				setToast(ko("The scene changed while deleting, so the image was kept. Please review storage again.", "삭제하는 동안 씬이 변경되어 이미지를 보존했어요. 저장소를 다시 확인해 주세요."));
+				setToast(ko("The scene changed while deleting, so the image was kept. Please review storage again.", "삭제하는 동안 씬이 변경되어 이미지를 보존했어요. 저장소를 다시 확인해 주세요.", "删除时场景变了，所以图片留着。请再看一眼存储。"));
 				return false;
 			}
 			evictAssetTexture(id);
@@ -3913,7 +3914,7 @@ export default function App() {
 		// A synchronous ref, shared by ALL four kinds and retry, is authoritative.
 		// React's busy state alone cannot guard two calls in the same event turn.
 		if (recRef.current) {
-			if (request.external) throw new Error(ko("An export is already running", "이미 내보내기 중입니다"));
+			if (request.external) throw new Error(ko("An export is already running", "이미 내보내기 중입니다", "已经在导出了"));
 			return null;
 		}
 		const job = { request, controller: new AbortController(), capture: null, cancellable: false };
@@ -4172,7 +4173,7 @@ export default function App() {
 	function exportPhaseLabel(phase) {
 		return ({ preparing: ko("Preparing", "준비 중"), encoding: ko("Encoding", "인코딩 중"),
 			finalizing: ko("Finalizing", "마무리 중"), completed: ko("Completed", "완료"),
-			failed: ko("Failed", "실패"), cancelled: ko("Cancelled", "취소됨") })[phase] ?? "";
+			failed: ko("Failed", "실패", "失败"), cancelled: ko("Cancelled", "취소됨", "已取消") })[phase] ?? "";
 	}
 
 	function exportFeedback() {
@@ -4194,7 +4195,7 @@ export default function App() {
 					: phase === "preparing" ? ko("Preparing the renderer and checking MP4 support…", "렌더러를 준비하고 MP4 지원을 확인하고 있어요…")
 					: ko("Encoding the requested frames, not yet a completed file.", "요청한 프레임을 인코딩 중이에요. 아직 파일이 완성되지 않았어요.")}</p>}
 				{retryable && <p>{ko("Retry keeps the original shot, camera, range and settings; it does not change your edits.", "다시 시도하면 원래 샷·카메라·범위·설정을 사용하며 편집 내용은 바꾸지 않아요.")}</p>}
-				{handedOff > 0 && <p>{ko(`${handedOff} file(s) already handed off. Retry skips those downloads; check browser downloads because OS saves cannot be confirmed.`, `파일 ${handedOff}개는 이미 전달했어요. 다시 시도할 때 해당 다운로드는 건너뛰어요. OS 저장은 확인할 수 없으니 브라우저 다운로드를 확인하세요.`)}</p>}
+					{handedOff > 0 && <p>{ko(`${handedOff} file(s) already handed off. Retry skips those downloads; check browser downloads because OS saves cannot be confirmed.`, `파일 ${handedOff}개는 이미 전달했어요. 다시 시도할 때 해당 다운로드는 건너뛰어요. OS 저장은 확인할 수 없으니 브라우저 다운로드를 확인하세요.`, `已有 ${handedOff} 个文件交付。重试会跳过这些下载；系统保存结果无法确认，请检查浏览器下载列表。`)}</p>}
 				<div className="export-status-actions">
 					{busy && cancellable && <button type="button" data-testid="export-cancel" onClick={stopShotRecording}>{ko("Cancel export", "내보내기 취소")}</button>}
 					{retryable && <button type="button" data-testid="export-retry" disabled={recState === "recording"} onClick={() => void retryExport()}>{ko("Retry same export", "같은 내보내기 재시도")}</button>}
@@ -4215,7 +4216,7 @@ export default function App() {
 
 	function downloadOtioCutList() {
 		if (!shots.length) {
-			setToast(ko("Add at least one Shot before exporting OTIO", "OTIO를 내보내려면 샷을 하나 이상 추가하세요"));
+			setToast(ko("Add at least one Shot before exporting OTIO", "OTIO를 내보내려면 샷을 하나 이상 추가하세요", "导出 OTIO 前请至少加一条镜头"));
 			return;
 		}
 		try {
@@ -4336,13 +4337,13 @@ export default function App() {
 		updateExportStatus(job, "preparing", { stage: "frames", cancellable: true });
 		await exportBoundary(job);
 		const packShot = { title: entry.name, index: index + 1, startFrame: entry.startFrame, endFrame: entry.endFrame };
-		onProgress?.(ko(`Rendering frames for "${entry.name}"`, `"${entry.name}" 프레임 렌더링 중`));
+		onProgress?.(ko(`Rendering frames for "${entry.name}"`, `"${entry.name}" 프레임 렌더링 중`, `正在渲染 “${entry.name}” 的帧`));
 		const firstUrl = captureShotFramePng(entry.startFrame);
-		if (!firstUrl) throw Object.assign(new Error(ko("The shot renderer is not ready", "샷 렌더러가 아직 준비되지 않았어요")), { exportFailureCode: "render_failed" });
+		if (!firstUrl) throw Object.assign(new Error(ko("The shot renderer is not ready", "샷 렌더러가 아직 준비되지 않았어요", "镜头渲染器还没准备好")), { exportFailureCode: "render_failed" });
 		await exportBoundary(job);
 		const lastUrl = entry.endFrame > entry.startFrame ? captureShotFramePng(entry.endFrame) : null;
 		await exportBoundary(job);
-		onProgress?.(ko(`Recording the clip for "${entry.name}"`, `"${entry.name}" 클립 녹화 중`));
+		onProgress?.(ko(`Recording the clip for "${entry.name}"`, `"${entry.name}" 클립 녹화 중`, `正在录制 “${entry.name}” 片段`));
 		const recorded = await runShotExport({ startFrame: entry.startFrame, endFrame: entry.endFrame, download: false }, job);
 		updateExportStatus(job, "finalizing", { stage: "archive", cancellable: true });
 		await exportBoundary(job);
@@ -4379,7 +4380,7 @@ export default function App() {
 			if (index < 0) throw new Error(`Unknown shots ID: ${shotId}`);
 			return index;
 		}
-		if (!shots.length) throw new Error(ko("Add at least one Shot before exporting a keyframe pack", "키프레임 팩을 내보내려면 샷을 하나 이상 추가하세요"));
+		if (!shots.length) throw new Error(ko("Add at least one Shot before exporting a keyframe pack", "키프레임 팩을 내보내려면 샷을 하나 이상 추가하세요", "导出关键帧包前请至少加一条镜头"));
 		const atPlayhead = shotIndexAtFrame(shots, tlFrame);
 		return atPlayhead >= 0 ? atPlayhead : 0;
 	}
@@ -4392,10 +4393,10 @@ export default function App() {
 		if (shotId && current < 0) return null;
 		const targets = everyShot ? shots.map((_, index) => index) : [current];
 		return executeExportRequest(exportRequest("keyframe_pack", async (job) => {
-			if (!job.request.context.shots.length) throw new Error(ko("Add at least one Shot before exporting a keyframe pack", "키프레임 팩을 내보내려면 샷을 하나 이상 추가하세요"));
+			if (!job.request.context.shots.length) throw new Error(ko("Add at least one Shot before exporting a keyframe pack", "키프레임 팩을 내보내려면 샷을 하나 이상 추가하세요", "导出关键帧包前请至少加一条镜头"));
 			for (const [order, index] of targets.entries()) {
 				if (job.request.handedOff.has(index)) continue;
-				job.label = ko(`Shot ${order + 1} of ${targets.length}`, `샷 ${order + 1} / ${targets.length}`);
+				job.label = ko(`Shot ${order + 1} of ${targets.length}`, `샷 ${order + 1} / ${targets.length}`, `镜头 ${order + 1} / ${targets.length}`);
 				const pack = await buildShotKeyframePack(job.request.context.shots[index], index, null, job);
 				job.controller.signal.throwIfAborted();
 				const url = URL.createObjectURL(new Blob([pack.bytes], { type: "application/zip" }));
@@ -4412,7 +4413,7 @@ export default function App() {
 		try {
 			const dataUrls = renderPassDataUrls();
 			for (const kind of ["depth", "normal"]) saveDownload(dataUrls[kind], passFileName(kind));
-			setToast(ko("Depth and normal passes downloaded", "뎁스·노멀 패스를 다운로드했어요"));
+			setToast(ko("Depth and normal passes downloaded", "뎁스·노멀 패스를 다운로드했어요", "已下载深度和法线通道"));
 			trackFeature("export_render_pass");
 		} catch (error) {
 			setToast(error?.message || String(error));
@@ -4425,11 +4426,11 @@ export default function App() {
 	function renderPassDataUrls(kinds = ["depth", "normal"]) {
 		const capture = captureRef.current;
 		const cam = shotCamRef.current;
-		if (!capture || !cam) throw new Error(ko("The shot renderer is not ready", "샷 렌더러가 아직 준비되지 않았어요"));
+		if (!capture || !cam) throw new Error(ko("The shot renderer is not ready", "샷 렌더러가 아직 준비되지 않았어요", "镜头渲染器还没准备好"));
 		const output = {};
 		for (const kind of kinds) {
 			const dataUrl = renderPass(capture, capture.scene, cam, kind, bufferToPng);
-			if (!dataUrl) throw new Error(ko("The shot renderer is not ready", "샷 렌더러가 아직 준비되지 않았어요"));
+			if (!dataUrl) throw new Error(ko("The shot renderer is not ready", "샷 렌더러가 아직 준비되지 않았어요", "镜头渲染器还没准备好"));
 			output[kind] = dataUrl;
 		}
 		return output;
@@ -4438,8 +4439,8 @@ export default function App() {
 	/** Contact sheet of the whole cut: one thumbnail and prompt per shot. */
 	async function exportStoryboard() {
 		try {
-			if (!shots.length) throw new Error(ko("Add at least one Shot before exporting a storyboard", "스토리보드를 내보내려면 샷을 하나 이상 추가하세요"));
-			setToast(ko("Composing the storyboard…", "스토리보드 구성 중…"));
+			if (!shots.length) throw new Error(ko("Add at least one Shot before exporting a storyboard", "스토리보드를 내보내려면 샷을 하나 이상 추가하세요", "导出分镜前请至少加一条镜头"));
+			setToast(ko("Composing the storyboard…", "스토리보드 구성 중…", "正在拼分镜…"));
 			const cells = [];
 			for (const [index, entry] of shots.entries()) {
 				const dataUrl = captureShotFramePng(entry.startFrame);
@@ -4497,7 +4498,7 @@ export default function App() {
 		const captured = liveHandlersRef.current?.capture_framing_png?.({ output: FAL_MOTION_STILL_OUTPUT });
 		if (!captured?.dataUrl?.startsWith("data:image/")) throw new Error(ko("렌더러가 준비되지 않았어요.", "The shot renderer is not ready."));
 		if (captured.width !== FAL_MOTION_STILL_OUTPUT.width || captured.height !== FAL_MOTION_STILL_OUTPUT.height) {
-			throw new Error(ko(`H3 480P 참조 캡처는 ${FAL_MOTION_STILL_OUTPUT.width}×${FAL_MOTION_STILL_OUTPUT.height}이어야 해요.`, `The H3 480P reference must be captured at ${FAL_MOTION_STILL_OUTPUT.width}×${FAL_MOTION_STILL_OUTPUT.height}.`));
+			throw new Error(ko(`H3 480P 참조 캡처는 ${FAL_MOTION_STILL_OUTPUT.width}×${FAL_MOTION_STILL_OUTPUT.height}이어야 해요.`, `The H3 480P reference must be captured at ${FAL_MOTION_STILL_OUTPUT.width}×${FAL_MOTION_STILL_OUTPUT.height}.`, `H3 480P 参考画面必须是 ${FAL_MOTION_STILL_OUTPUT.width}×${FAL_MOTION_STILL_OUTPUT.height}。`));
 		}
 		// H3 must see the same complete subject in both endpoints. A clipped
 		// foot or head makes the model invent the missing geometry during the
@@ -4702,7 +4703,7 @@ export default function App() {
 	/** Why the chip cannot start an AI video motion now, as the user reads it:
 	 * one already running, or none left today. The lock has its own Fal card line. */
 	function falMotionUnavailable() {
-		if (!["idle", "done", "error", "failed"].includes(falMotion.status)) return ko("A generation is already running", "이미 생성이 돌고 있어요");
+		if (!["idle", "done", "error", "failed"].includes(falMotion.status)) return ko("A generation is already running", "이미 생성이 돌고 있어요", "已经在生成了");
 		if (falMotion.dailyRemaining === 0) return ko("No AI video motion generations left today", "오늘 남은 AI 영상 모션 생성이 없어요");
 		return null;
 	}
@@ -5327,11 +5328,11 @@ export default function App() {
 	}, [activeChar.x, activeChar.z, tlFps, waypoints]);
 
 	const stateBadge = ardyRunning
-		? { label: ko("GENERATING", "생성 중"), kind: "generating" }
+		? { label: ko("GENERATING", "생성 중", "生成中"), kind: "generating" }
 		: motion
-			? { label: ko("PLAYBACK", "재생"), kind: "playback" }
+			? { label: ko("PLAYBACK", "재생", "播放"), kind: "playback" }
 			: waypointMode
-				? { label: ko("ROOT PATH", "루트 경로"), kind: "root" }
+				? { label: ko("ROOT PATH", "루트 경로", "根路径"), kind: "root" }
 				: null;
 
 	function applyPreset(key) {
@@ -5401,7 +5402,7 @@ export default function App() {
 		write
 			.then(() => {
 				setCopied(true);
-				setToast(ko("Prompt copied to clipboard", "프롬프트를 클립보드에 복사했어요"));
+				setToast(ko("Prompt copied to clipboard", "프롬프트를 클립보드에 복사했어요", "提示词已复制到剪贴板"));
 			})
 			.catch(() => {});
 	}
@@ -5679,7 +5680,7 @@ export default function App() {
 		if (toast) {
 			setToast(ko(
 				"Pins cleared — one edit is one gesture, and this one is now the path",
-				"찍은 순간을 지웠어요 — 한 번의 편집은 한 가지 방식이라, 지금은 궤적 편집이에요",
+				"찍은 순간을 지웠어요 — 한 번의 편집은 한 가지 방식이라, 지금은 궤적 편집이에요", "钉点已清除 — 一次编辑是一个手势，现在这条就是路径",
 			));
 		}
 	}
@@ -5806,7 +5807,7 @@ export default function App() {
 	function lineDriftHint() {
 		return ko(
 			"The view moved — the pending edit still applies; the dashed line is that same edit seen from here. Return toward the original view to grab it again, or Generate/undo from here.",
-			"시점이 움직였어요 — 편집한 궤적은 그대로 적용되며, 점선은 같은 궤적을 지금 시점에서 본 모습입니다. 다시 잡으려면 원래 시점 쪽으로 돌아가고, 지금 이 상태에서 생성하거나 되돌려도 됩니다.",
+			"시점이 움직였어요 — 편집한 궤적은 그대로 적용되며, 점선은 같은 궤적을 지금 시점에서 본 모습입니다. 다시 잡으려면 원래 시점 쪽으로 돌아가고, 지금 이 상태에서 생성하거나 되돌려도 됩니다.", "视角动了 — 未提交的编辑仍在；虚线就是从这里看到的同一处编辑。转回原视角再抓，或在这里生成/撤销。",
 		);
 	}
 
@@ -6896,7 +6897,7 @@ export default function App() {
 			linePreviewShownRef.current = url;
 			setLinePreviewUrl(url);
 		} catch {
-			setLinePreviewError(ko("The preview could not be read back", "미리보기를 읽지 못했어요"));
+			setLinePreviewError(ko("The preview could not be read back", "미리보기를 읽지 못했어요", "没能读回预览"));
 			await revertLinePreview();
 		}
 	}
@@ -7048,11 +7049,11 @@ export default function App() {
 	function toggleLineEditMode() {
 		if (lineEditMode) {
 			exitLineEditMode();
-			setToast(ko("Line editing off", "라인 편집 꺼짐"));
+			setToast(ko("Line editing off", "라인 편집 꺼짐", "轨迹编辑已关"));
 			return;
 		}
 		if (!motion?.url) {
-			setToast(ko("The current take has no bridge source — generate it once before editing a path", "현재 테이크에 브리지 원본이 없어요 — 궤적을 편집하기 전에 한 번 생성하세요"));
+			setToast(ko("The current take has no bridge source — generate it once before editing a path", "현재 테이크에 브리지 원본이 없어요 — 궤적을 편집하기 전에 한 번 생성하세요", "当前条没有桥接源 — 编辑轨迹前请先生成一次"));
 			return;
 		}
 		if (waypointMode) setWaypointMode(false);
@@ -7062,7 +7063,7 @@ export default function App() {
 		setLineEditMode(true);
 		setToast(ko(
 			"Path editing on — draw along the path to reroute that section, or grab a dot and pull; the view still orbits normally",
-			"궤적 편집 켜짐 — 궤적을 따라 그리면 그 구간만 새로 지나가고, 점을 잡아 끌 수도 있어요. 시점은 평소처럼 돌릴 수 있어요",
+			"궤적 편집 켜짐 — 궤적을 따라 그리면 그 구간만 새로 지나가고, 점을 잡아 끌 수도 있어요. 시점은 평소처럼 돌릴 수 있어요", "路径编辑已开 — 沿路径重画这一段，或抓住点拉；视角仍可正常环绕",
 		));
 	}
 
@@ -7281,7 +7282,7 @@ export default function App() {
 				setGenQueue((queue) => queue.map((job) => (job.id === next.id ? { ...job, status: "done" } : job)));
 			} catch (err) {
 				next.commandCompletion?.reject(err);
-				const message = err?.name === "AbortError" ? ko("Cancelled", "취소됨") : err?.message || String(err);
+				const message = err?.name === "AbortError" ? ko("Cancelled", "취소됨", "已取消") : err?.message || String(err);
 				setGenQueue((queue) => queue.map((job) => (job.id === next.id ? { ...job, status: "error", error: message } : job)));
 			} finally {
 				genRunningRef.current = false;
@@ -7502,7 +7503,7 @@ export default function App() {
 		else if (entry.domain === "cast") { publishStudioCharacters(entry.state.characters); syncStudioLayerBuffer(entry.state.characters); }
 		else publishStudioMotion(entry.targetId, entry.state);
 		sceneRevisionRef.current++; appContext.nextTick();
-		setToast(redo ? ko("Redone", "다시 실행됨") : ko("Undone", "실행 취소됨")); return true;
+		setToast(redo ? ko("Redone", "다시 실행됨", "已重做") : ko("Undone", "실행 취소됨", "已撤销")); return true;
 	}
 	function commitStudioDraft(payload) {
 		const historyEntryId = crypto.randomUUID();
@@ -7754,14 +7755,14 @@ export default function App() {
 	useEffect(() => { for (const resolve of renderWaitersRef.current.splice(0)) resolve(); });
 
 	const projectStatus = projectSaveState === "saving"
-		? ko("Saving…", "저장 중…")
+		? ko("Saving…", "저장 중…", "保存中…")
 		: projectSaveState === "error"
-			? ko("Save failed", "저장 실패")
+			? ko("Save failed", "저장 실패", "保存失败")
 			: projectName === null
-				? ko("Not saved", "저장되지 않음")
+				? ko("Not saved", "저장되지 않음", "未保存")
 				: projectDirty
-					? ko("Unsaved changes", "저장되지 않은 변경사항")
-					: ko("Saved", "저장됨");
+					? ko("Unsaved changes", "저장되지 않은 변경사항", "未保存的更改")
+					: ko("Saved", "저장됨", "已保存");
 
 	return (
 		<AppContext.Provider value={appContext}>
@@ -7786,8 +7787,8 @@ export default function App() {
 					projectManifest={projectManifest}
 				/>
 				<div className="topbar-actions">
-					<a className="topbar-action workflow-topbar-link" href="/workflow/" aria-label={ko("Open Workflow", "워크플로 열기")}>{ko("Workflow", "워크플로우")}</a>
-					<div className="project-actions" aria-label={ko("Project actions", "프로젝트 작업")}>
+					<a className="topbar-action workflow-topbar-link" href="/workflow/" aria-label={ko("Open Workflow", "워크플로 열기", "打开工作流")}>{ko("Workflow", "워크플로우", "工作流")}</a>
+					<div className="project-actions" aria-label={ko("Project actions", "프로젝트 작업", "项目操作")}>
 						<button
 							type="button"
 							className="topbar-action project-save-action"
@@ -7795,7 +7796,7 @@ export default function App() {
 							disabled={projectSaveState === "saving"}
 							onClick={() => void runStudioAction("project.save")}
 						>
-							{projectSaveState === "saving" ? ko("Saving…", "저장 중…") : ko("Save", "저장")}
+							{projectSaveState === "saving" ? ko("Saving…", "저장 중…", "保存中…") : ko("Save", "저장", "保存")}
 						</button>
 						{/* One Export menu for every delivery this studio makes (#193,
 						    R4). The keyframe pack leads because it is the pack an AI video
@@ -7829,7 +7830,7 @@ export default function App() {
 									setExportMenuOpen((open) => !open);
 								}}
 							>
-								{ko("Export", "내보내기")}
+								{ko("Export", "내보내기", "导出")}
 								{exportStatus && <span className="export-trigger-state" data-phase={exportStatus.phase}>{exportPhaseLabel(exportStatus.phase)}</span>}
 								<span className="caret">▾</span>
 							</button>
@@ -7848,12 +7849,12 @@ export default function App() {
 										disabled={!shots.length || recState === "recording"}
 										data-disabled-reason={shots.length ? undefined : "no-shots"}
 										title={shots.length
-											? ko("First/last frames, clip, camera and prompt as one zip — hold Shift for every shot", "첫/마지막 프레임·클립·카메라·프롬프트를 zip 하나로 — Shift를 누르면 모든 샷")
+											? ko("First/last frames, clip, camera and prompt as one zip — hold Shift for every shot", "첫/마지막 프레임·클립·카메라·프롬프트를 zip 하나로 — Shift를 누르면 모든 샷", "起止帧、片段、相机和提示词打成一个 zip — 按住 Shift 导出所有镜头")
 											: ko("Add a shot first — a pack describes one cut", "샷을 먼저 추가하세요 — 팩은 컷 하나를 설명합니다")}
 										onClick={(event) => void exportKeyframePacks(event.shiftKey, exportShotIdRef.current)}
 									>
 										{ko("Keyframe pack (zip)", "키프레임 팩 (zip)")}
-										<small>{ko("Shift: every shot", "Shift: 모든 샷")}</small>
+										<small>{ko("Shift: every shot", "Shift: 모든 샷", "Shift：所有镜头")}</small>
 									</button>
 									{(shots.length > 0 || hasCameraKeys || motion) && (
 										<button
@@ -7872,10 +7873,10 @@ export default function App() {
 										role="menuitem"
 										data-testid="export-render-passes"
 										disabled={recState === "recording"}
-										title={ko("Depth and normal conditioning plates of the current framing", "현재 프레이밍의 뎁스·노멀 컨디션 플레이트")}
+										title={ko("Depth and normal conditioning plates of the current framing", "현재 프레이밍의 뎁스·노멀 컨디션 플레이트", "当前构图的深度和法线条件板")}
 										onClick={exportRenderPasses}
 									>
-										{ko("Depth + normal passes", "뎁스 + 노멀 패스")}
+										{ko("Depth + normal passes", "뎁스 + 노멀 패스", "深度 + 法线通道")}
 									</button>
 									<button
 										type="button"
@@ -7895,7 +7896,7 @@ export default function App() {
 										disabled={!shots.length || recState === "recording"}
 										data-disabled-reason={shots.length ? undefined : "no-shots"}
 										title={shots.length
-											? ko("Contact sheet of every shot with its prompt", "모든 샷과 프롬프트를 담은 콘택트 시트")
+											? ko("Contact sheet of every shot with its prompt", "모든 샷과 프롬프트를 담은 콘택트 시트", "每条镜头及其提示词的样片表")
 											: ko("Add a shot first — a storyboard is one row per shot", "샷을 먼저 추가하세요 — 스토리보드는 샷마다 한 줄입니다")}
 										onClick={() => void exportStoryboard()}
 									>
@@ -7906,7 +7907,7 @@ export default function App() {
 											type="button"
 											role="menuitem"
 											data-testid="export-otio"
-											title={ko("Download OTIO cut list", "OTIO 컷 목록 다운로드")}
+											title={ko("Download OTIO cut list", "OTIO 컷 목록 다운로드", "下载 OTIO 剪辑表")}
 											onClick={downloadOtioCutList}
 										>
 											{ko("OTIO cut list", "OTIO 컷 목록")}
@@ -7933,7 +7934,7 @@ export default function App() {
 					</div>
 					{liveWorkspaceHandle && (
 						<span className="live-workspace-handle" data-live-workspace={liveWorkspaceHandle} title={liveWorkspaceHandle}>
-							{ko("Live workspace", "라이브 작업공간")} {liveWorkspaceHandle}
+							{ko("Live workspace", "라이브 작업공간", "实时工作区")} {liveWorkspaceHandle}
 						</span>
 					)}
 					<SettingsMenu
@@ -7945,13 +7946,13 @@ export default function App() {
 
 			<div className="main" style={workspaceStyle}>
 			<div className="workspace">
-				<aside className="panel hierarchy-left" aria-label={ko("Hierarchy", "계층")}>
+				<aside className="panel hierarchy-left" aria-label={ko("Hierarchy", "계층", "层级")}>
 				{/* Project > Scene: the project is the document root, scenes live
 				    inside it — the picker sits at the top of the hierarchy column. */}
 				<div className="hierarchy-project" data-dirty={projectDirty || undefined}>
-					<span className="hierarchy-project-label">{ko("Project", "프로젝트")}</span>
-					<strong>{projectName ?? (projectStartupOpen ? ko("Choose Project", "프로젝트 선택") : ko("Untitled", "제목 없음"))}</strong>
-					{projectDirty && <i className="project-dirty-dot" aria-label={ko("Unsaved changes", "저장되지 않은 변경사항")} />}
+					<span className="hierarchy-project-label">{ko("Project", "프로젝트", "项目")}</span>
+					<strong>{projectName ?? (projectStartupOpen ? ko("Choose Project", "프로젝트 선택", "选择项目") : ko("Untitled", "제목 없음", "未命名"))}</strong>
+					{projectDirty && <i className="project-dirty-dot" aria-label={ko("Unsaved changes", "저장되지 않은 변경사항", "未保存的更改")} />}
 				</div>
 				<HierarchyPanel
 					selectedId={selectedHierarchyId}
@@ -7988,16 +7989,16 @@ export default function App() {
 				<div
 					className="workspace-splitter workspace-splitter-vertical"
 					role="separator"
-					aria-label={ko("Resize hierarchy panel", "계층 패널 크기 조절")}
+					aria-label={ko("Resize hierarchy panel", "계층 패널 크기 조절", "调整层级面板大小")}
 					onPointerDown={(event) => beginWorkspaceResize("hierarchy", event)}
 				/>
 				<div className="viewport" data-drop={viewportDrop.over ? "over" : undefined} {...viewportDrop.handlers}>
 				<div className="viewport-titlebar">
-				<div className="workflow-mode-switch" role="tablist" aria-label={ko("Workflow", "작업 모드")}>
+				<div className="workflow-mode-switch" role="tablist" aria-label={ko("Workflow", "작업 모드", "工作流")}>
 					{[
-						["scene", ko("Scene", "장면"), ko("Place subjects and props", "인물과 소품 배치")],
-						["camera", ko("Camera", "카메라"), ko("Frame the shot", "샷 구도 설정")],
-						["motion", ko("Motion", "모션"), ko("Edit timing and movement", "타이밍과 움직임 편집")],
+						["scene", ko("Scene", "장면", "场景"), ko("Place subjects and props", "인물과 소품 배치", "摆放人物和道具")],
+						["camera", ko("Camera", "카메라", "相机"), ko("Frame the shot", "샷 구도 설정", "定好镜头构图")],
+						["motion", ko("Motion", "모션", "动作"), ko("Edit timing and movement", "타이밍과 움직임 편집", "编辑时机和运动")],
 					].map(([id, label, hint]) => (
 						<button
 							type="button"
@@ -8012,59 +8013,59 @@ export default function App() {
 						</button>
 					))}
 				</div>
-				<div className="editor-toolbar scene-tools" aria-label={ko("Scene tools", "장면 도구")}>
+				<div className="editor-toolbar scene-tools" aria-label={ko("Scene tools", "장면 도구", "场景工具")}>
 					{workflowMode === "motion" && (
 						<span className="workflow-toolbar-hint" role="status">
-							{ko("Motion mode · edit the timeline below", "모션 모드 · 아래 타임라인에서 편집하세요")}
+							{ko("Motion mode · edit the timeline below", "모션 모드 · 아래 타임라인에서 편집하세요", "动作模式 · 在下方时间轴编辑")}
 						</span>
 					)}
-						<span className="transform-toolbar-label workflow-scene-context">{ko("Transform", "변환")}</span>
-						<div className="tool-switch workflow-scene-context" role="group" aria-label={ko("Transform tools", "변환 도구")} data-transform-controls>
+						<span className="transform-toolbar-label workflow-scene-context">{ko("Transform", "변환", "变换")}</span>
+						<div className="tool-switch workflow-scene-context" role="group" aria-label={ko("Transform tools", "변환 도구", "变换工具")} data-transform-controls>
 							<button
 								type="button"
 								className={gizmoMode === "move" ? "active" : ""}
-								title={ko("Move tool (W)", "이동 도구 (W)")}
+								title={ko("Move tool (W)", "이동 도구 (W)", "移动工具 (W)")}
 								aria-pressed={gizmoMode === "move"}
 								onClick={() => setGizmoMode("move")}
 							>
 								<svg viewBox="0 0 16 16" aria-hidden="true" className="tool-icon"><path d="M8 1v14M1 8h14" stroke="currentColor" strokeWidth="1.4"/><path d="M8 1 6 3h4L8 1zM8 15l-2-2h4l-2 2zM1 8l2-2v4L1 8zM15 8l-2-2v4l2-2z" fill="currentColor"/></svg>
-								{ko("Move", "이동")}
+								{ko("Move", "이동", "移动")}
 							</button>
 							<button
 								type="button"
 								className={gizmoMode === "rotate" ? "active" : ""}
-								title={ko("Rotate tool (E)", "회전 도구 (E)")}
+								title={ko("Rotate tool (E)", "회전 도구 (E)", "旋转工具 (E)")}
 								aria-pressed={gizmoMode === "rotate"}
 								onClick={() => setGizmoMode("rotate")}
 							>
 								<svg viewBox="0 0 16 16" aria-hidden="true" className="tool-icon"><circle cx="8" cy="8" r="5.4" fill="none" stroke="currentColor" strokeWidth="1.4"/><path d="M13.4 8l2-2v4l-2 2z" fill="currentColor" transform="rotate(45 13.4 8)"/></svg>
-								{ko("Rotate", "회전")}
+								{ko("Rotate", "회전", "旋转")}
 							</button>
 							<button
 								type="button"
 								className={gizmoMode === "scale" ? "active" : ""}
-								title={ko("Scale tool (R)", "크기 도구 (R)")}
+								title={ko("Scale tool (R)", "크기 도구 (R)", "缩放工具 (R)")}
 								aria-pressed={gizmoMode === "scale"}
 								onClick={() => setGizmoMode("scale")}
 							>
 								<svg viewBox="0 0 16 16" aria-hidden="true" className="tool-icon"><rect x="3" y="3" width="7" height="7" fill="none" stroke="currentColor" strokeWidth="1.4"/><path d="M13 13h-4M13 13V9M13 13l-3.5-3.5" stroke="currentColor" strokeWidth="1.4" fill="none"/></svg>
-								{ko("Scale", "크기")}
+								{ko("Scale", "크기", "缩放")}
 							</button>
 						</div>
 						<button
 							type="button"
 							className={"snap-switch workflow-scene-context" + (snapEnabled ? " active" : "")}
-							title={ko("Grid snapping — hold Ctrl during a drag to invert", "그리드 스냅 — 드래그 중 Ctrl을 누르면 반대로 작동")}
+							title={ko("Grid snapping — hold Ctrl during a drag to invert", "그리드 스냅 — 드래그 중 Ctrl을 누르면 반대로 작동", "网格吸附 — 拖动时按住 Ctrl 可反转")}
 							aria-pressed={snapEnabled}
 							onClick={() => setSnapEnabled((v) => !v)}
 						>
-							{ko("Snap", "스냅")}
+							{ko("Snap", "스냅", "吸附")}
 						</button>
 						<span className="viewport-toolbar-separator settings-separator workflow-camera-context" aria-hidden="true" />
 						<label className="viewport-toolbar-field shot-field workflow-camera-context">
-							<span>{ko("Shot", "샷")}</span>
+							<span>{ko("Shot", "샷", "镜头")}</span>
 							<select
-								aria-label={ko("Shot preset", "샷 프리셋")}
+								aria-label={ko("Shot preset", "샷 프리셋", "镜头预设")}
 								value={preset}
 								onChange={(event) => applyPreset(event.target.value)}
 							>
@@ -8074,9 +8075,9 @@ export default function App() {
 							</select>
 						</label>
 						<label className="viewport-toolbar-field ratio-field workflow-camera-context">
-							<span>{ko("Cam", "카메라")}</span>
+							<span>{ko("Cam", "카메라", "相机")}</span>
 							<select
-								aria-label={ko("Camera preset", "카메라 프리셋")}
+								aria-label={ko("Camera preset", "카메라 프리셋", "相机预设")}
 								value={cameraPresetId ?? ""}
 								disabled={falMotionCameraLocked}
 								onChange={(event) => {
@@ -8085,16 +8086,16 @@ export default function App() {
 									liveHandlersRef.current?.set_camera({ preset: id });
 								}}
 							>
-								<option value="">{ko("Free", "자유")}</option>
-								{Object.values(CAMERA_PRESETS).map((value) => (
-									<option key={value.id} value={value.id}>{value.label}</option>
+								<option value="">{ko("Free", "자유", "自由")}</option>
+					{Object.values(CAMERA_PRESETS).map((value) => (
+									<option key={value.id} value={value.id}>{ko(value.label, value.label, value.id === "mocapLocomotion" ? "动捕：行走" : value.id === "mocapInteraction" ? "动捕：互动" : value.label)}</option>
 								))}
 							</select>
 						</label>
 						<label className="viewport-toolbar-field ratio-field workflow-camera-context">
-							<span>{ko("Ratio", "비율")}</span>
+							<span>{ko("Ratio", "비율", "比例")}</span>
 							<select
-								aria-label={ko("Output aspect ratio", "출력 화면 비율")}
+								aria-label={ko("Output aspect ratio", "출력 화면 비율", "输出画幅")}
 								value={shotAspectKey}
 								onChange={(event) => stageDomain.setShotAspectKey(event.target.value)}
 							>
@@ -8120,8 +8121,8 @@ export default function App() {
 						<span className="viewport-toolbar-spacer workflow-camera-context" />
 						<button
 							type="button"
-							title={ko("Recenter on subject", "피사체 다시 맞추기")}
-							aria-label={ko("Recenter on subject", "피사체 다시 맞추기")}
+							title={ko("Recenter on subject", "피사체 다시 맞추기", "重新对准人物")}
+							aria-label={ko("Recenter on subject", "피사체 다시 맞추기", "重新对准人物")}
 							className="workflow-camera-context"
 							onClick={() => setNonce((n) => n + 1)}
 						>
@@ -8135,7 +8136,7 @@ export default function App() {
 								runStudioAction("view.setInset", { collapsed: !workspaceLayout.insetCollapsed });
 							}}
 						>
-							{ko("Top", "탑")} {workspaceLayout.insetCollapsed ? "▸" : "▾"}
+							{ko("Top", "탑", "顶")} {workspaceLayout.insetCollapsed ? "▸" : "▾"}
 						</button>
 						{/* One menu for every viewport-look toggle (R4), in every mode:
 						    what the stage LOOKS like is not a mode's business. The 27px
@@ -8178,7 +8179,7 @@ export default function App() {
 										className={"view-menu-item grid-view-switch" + (gridView ? " active" : "")}
 										aria-checked={gridView}
 										aria-pressed={gridView}
-										title={ko("Blender-style viewport — dark void with a reference grid instead of the deck", "Blender식 뷰포트 — 데크 대신 어두운 배경과 기준 그리드")}
+										title={ko("Blender-style viewport — dark void with a reference grid instead of the deck", "Blender식 뷰포트 — 데크 대신 어두운 배경과 기준 그리드", "Blender 式视口 — 不用台面，改用深色背景和参考网格")}
 										onClick={() => setGridView((v) => !v)}
 									>
 										<span className="view-menu-mark" aria-hidden="true">{gridView ? "✓" : ""}</span>
@@ -8192,7 +8193,7 @@ export default function App() {
 										aria-pressed={autoColor}
 										title={ko(
 											"Distinct display colors per object — captures include them while on",
-											"오브젝트별 구분 색 — 켜둔 동안 캡처에도 포함됩니다",
+											"오브젝트별 구분 색 — 켜둔 동안 캡처에도 포함됩니다", "每个物体用不同显示色 — 开着时截帧也会带上",
 										)}
 										onClick={() => {
 											setAutoColor((on) => {
@@ -8203,17 +8204,17 @@ export default function App() {
 										}}
 									>
 										<span className="view-menu-mark" aria-hidden="true">{autoColor ? "✓" : ""}</span>
-										{ko("Auto Color", "자동 색")}
+										{ko("Auto Color", "자동 색", "自动颜色")}
 									</button>
 									{/* Part colours repaint a BODY, so the section only exists
 									    while a character is selected (R2). */}
 									{isCharacterSelection && (
-										<div className="view-menu-group" role="group" aria-label={ko("Body part colours", "부위 색상")}>
-											<span className="view-menu-label" aria-hidden="true">{ko("Body part colours", "부위 색상")}</span>
+										<div className="view-menu-group" role="group" aria-label={ko("Body part colours", "부위 색상", "部位颜色")}>
+											<span className="view-menu-label" aria-hidden="true">{ko("Body part colours", "부위 색상", "部位颜色")}</span>
 											{[
 												{ value: "off", label: ko("Off", "끕") },
-												{ value: "shaded", label: ko("Shaded", "음영") },
-												{ value: "flat", label: ko("Flat", "평면") },
+												{ value: "shaded", label: ko("Shaded", "음영", "着色") },
+												{ value: "flat", label: ko("Flat", "평면", "平面") },
 											].map((option) => {
 												const checked = option.value === partColoursChoice;
 												return (
@@ -8295,11 +8296,11 @@ export default function App() {
 									event.preventDefault();
 									setToast(ko(
 										"The graphics context was lost — restoring the stage. If it stays black, reload the page; your work is autosaved.",
-										"그래픽 컨텍스트가 끊겼어요 — 무대를 복구합니다. 검게 남으면 새로고침하세요. 작업은 자동 저장돼 있습니다.",
+										"그래픽 컨텍스트가 끊겼어요 — 무대를 복구합니다. 검게 남으면 새로고침하세요. 작업은 자동 저장돼 있습니다.", "图形上下文丢了 — 正在恢复舞台。若一直黑屏，请刷新；内容已自动保存。",
 									));
 								});
 								gl.domElement.addEventListener("webglcontextrestored", () => {
-									setToast(ko("Graphics restored.", "그래픽이 복구됐어요."));
+									setToast(ko("Graphics restored.", "그래픽이 복구됐어요.", "画面已恢复。"));
 								});
 							}}
 						>
@@ -8594,7 +8595,7 @@ export default function App() {
 									changeSceneObject(selectedSceneObject.id, { path: { ...path, points } }, token);
 									endSceneTransaction(token, { commit: true });
 									setPathPointIndex(index + 1);
-									setToast(ko("Point added — drag it here, or lift it in the scene", "점을 추가했어요 — 여기서 끌거나 씬에서 높이를 올리세요"));
+									setToast(ko("Point added — drag it here, or lift it in the scene", "점을 추가했어요 — 여기서 끌거나 씬에서 높이를 올리세요", "加点了 — 可在这里拖，或在场景里抬高"));
 								}}
 								onObjectPathGestureStart={() => {
 									planPathTokenRef.current = beginSceneTransaction({ owner: "object-path", cancel: () => { planPathTokenRef.current = null; } });
@@ -8822,9 +8823,9 @@ export default function App() {
 						{glContextLost && (
 							<div className="gl-lost-overlay" role="alert">
 								<div className="gl-lost-card">
-									<strong>{ko("The 3D view lost its graphics context", "3D 뷰가 그래픽 컨텍스트를 잃었어요")}</strong>
-									<p>{ko("Waiting for the browser to restore it. If this stays, reload the studio — scenes autosave.", "브라우저가 복구하기를 기다리는 중이에요. 계속 멈춰 있으면 새로고침하세요 — 장면은 자동 저장됩니다.")}</p>
-									<button type="button" onClick={() => window.location.reload()}>{ko("Reload", "새로고침")}</button>
+									<strong>{ko("The 3D view lost its graphics context", "3D 뷰가 그래픽 컨텍스트를 잃었어요", "3D 视图丢掉了图形上下文")}</strong>
+									<p>{ko("Waiting for the browser to restore it. If this stays, reload the studio — scenes autosave.", "브라우저가 복구하기를 기다리는 중이에요. 계속 멈춰 있으면 새로고침하세요 — 장면은 자동 저장됩니다.", "正在等浏览器恢复。如果一直这样，请刷新工作室 — 场景会自动保存。")}</p>
+									<button type="button" onClick={() => window.location.reload()}>{ko("Reload", "새로고침", "重新加载")}</button>
 								</div>
 							</div>
 						)}
@@ -8841,7 +8842,7 @@ export default function App() {
 						>
 							<span
 								className="vp-inset-tag"
-								title={workspaceLayout.insetCollapsed ? ko("Click or ▸ to expand · drag to move", "클릭 또는 ▸로 펼치기 · 드래그로 이동") : ko("Click or ▾ to fold · drag to move", "클릭 또는 ▾로 접기 · 드래그로 이동")}
+								title={workspaceLayout.insetCollapsed ? ko("Click or ▸ to expand · drag to move", "클릭 또는 ▸로 펼치기 · 드래그로 이동", "点击或 ▸ 展开 · 拖动可移动") : ko("Click or ▾ to fold · drag to move", "클릭 또는 ▾로 접기 · 드래그로 이동", "点击或 ▾ 收起 · 拖动可移动")}
 								onPointerDown={beginInsetDrag}
 							>
 								<span
@@ -8849,8 +8850,8 @@ export default function App() {
 									role="button"
 									tabIndex={-1}
 									aria-expanded={!workspaceLayout.insetCollapsed}
-									aria-label={workspaceLayout.insetCollapsed ? ko("Expand inset view", "인셋 보기 펼치기") : ko("Collapse inset view", "인셋 보기 접기")}
-									title={workspaceLayout.insetCollapsed ? ko("Expand inset view", "인셋 보기 펼치기") : ko("Collapse inset view", "인셋 보기 접기")}
+									aria-label={workspaceLayout.insetCollapsed ? ko("Expand inset view", "인셋 보기 펼치기", "展开内嵌视图") : ko("Collapse inset view", "인셋 보기 접기", "收起内嵌视图")}
+									title={workspaceLayout.insetCollapsed ? ko("Expand inset view", "인셋 보기 펼치기", "展开内嵌视图") : ko("Collapse inset view", "인셋 보기 접기", "收起内嵌视图")}
 									onPointerDown={(e) => e.stopPropagation()}
 									// Same one-fold-per-gesture rule as the tag: ignore the
 									// second click of a double-click (detail=2).
@@ -8862,7 +8863,7 @@ export default function App() {
 								>
 									{workspaceLayout.insetCollapsed ? "▸" : "▾"}
 								</span>
-								{planIsMain || ikMode ? ko("Shot view", "샷 뷰") : ko("Top-View", "탑뷰")}
+								{planIsMain || ikMode ? ko("Shot view", "샷 뷰", "镜头视图") : ko("Top-View", "탑뷰", "顶视图")}
 								{!planIsMain && !ikMode && workspaceLayout.planZoom !== 1 && !workspaceLayout.insetCollapsed && (
 									<em className="vp-inset-zoom">{workspaceLayout.planZoom.toFixed(2).replace(/\.?0+$/, "")}×</em>
 								)}
@@ -8871,7 +8872,7 @@ export default function App() {
 								<span
 									className="vp-inset-resize"
 									role="separator"
-								aria-label={ko("Resize inset view", "인셋 보기 크기 조절")}
+								aria-label={ko("Resize inset view", "인셋 보기 크기 조절", "调整内嵌视图大小")}
 									onPointerDown={beginInsetResize}
 								/>
 							)}
@@ -8886,12 +8887,12 @@ export default function App() {
 							<ShotGuideOverlay mode={guideMode} aspect={shotOutput.aspect} />
 							<span className="vp-inset-tag vp-shot-preview-tag">
 								<span className="vp-rec-dot" aria-hidden="true" />
-								{ko("Shot", "샷")}
+								{ko("Shot", "샷", "镜头")}
 								<button
 									type="button"
 									className={"vp-guide-cycle" + (guideMode === "off" ? "" : " on")}
-									aria-label={ko("Cycle composition guides", "구도 가이드 전환")}
-									title={ko(GUIDE_LABELS[guideMode].en, GUIDE_LABELS[guideMode].ko) + ko(" · click to cycle", " · 클릭으로 전환")}
+									aria-label={ko("Cycle composition guides", "구도 가이드 전환", "切换构图辅助线")}
+									title={ko(GUIDE_LABELS[guideMode].en, GUIDE_LABELS[guideMode].ko, GUIDE_LABELS[guideMode].zh) + ko(" · click to cycle", " · 클릭으로 전환", " · 点击切换")}
 									onClick={() => runStudioAction("view.setGuideMode", { mode: nextGuideMode(guideMode) })}
 								>
 									<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -8902,7 +8903,7 @@ export default function App() {
 								<button
 									type="button"
 									className="vp-look-through"
-									aria-label={ko("Look through the shot camera", "샷 카메라 시점으로 보기")}
+									aria-label={ko("Look through the shot camera", "샷 카메라 시점으로 보기", "从镜头相机看")}
 									title={ko("Look through the shot camera — right-drag, WASD and orbit set the recording lens (Esc returns)", "샷 카메라 시점으로 보기 — 오른쪽 드래그, WASD, 궤도로 촬영 렌즈를 맞춥니다 (Esc로 복귀)")}
 									onClick={enterShotLook}
 								>
@@ -8923,12 +8924,12 @@ export default function App() {
 							<button
 								type="button"
 								className="vp-inset-tag vp-look-through-exit"
-								title={ko("Return to the editor view (Esc)", "에디터 시점으로 돌아가기 (Esc)")}
+								title={ko("Return to the editor view (Esc)", "에디터 시점으로 돌아가기 (Esc)", "回到编辑视图 (Esc)")}
 								onClick={exitPreview}
 							>
 								<span className="vp-rec-dot" aria-hidden="true" />
-								{ko("Shot camera", "샷 카메라")}
-								<span className="vp-exit-hint">{ko("Esc · exit", "Esc · 나가기")}</span>
+								{ko("Shot camera", "샷 카메라", "镜头相机")}
+								<span className="vp-exit-hint">{ko("Esc · exit", "Esc · 나가기", "Esc · 退出")}</span>
 							</button>
 						)}
 
@@ -8945,7 +8946,7 @@ export default function App() {
 							<span />
 						</div>
 						<div className={"caption" + (subjectVisible ? "" : " off")} hidden={playMode || !lookThroughShot}>
-							{subjectVisible ? slateLineKo(shot) : ko("SUBJECT OUT OF FRAME", "피사체가 프레임 밖에 있어요")}
+							{subjectVisible ? slateLineKo(shot) : ko("SUBJECT OUT OF FRAME", "피사체가 프레임 밖에 있어요", "人物出画了")}
 						</div>
 
 						</div>
@@ -8954,7 +8955,7 @@ export default function App() {
 				<div
 					className="workspace-splitter workspace-splitter-vertical"
 					role="separator"
-					aria-label={ko("Resize hierarchy and inspector panel", "계층 및 속성 패널 크기 조절")}
+					aria-label={ko("Resize hierarchy and inspector panel", "계층 및 속성 패널 크기 조절", "调整层级和属性面板大小")}
 					onPointerDown={(event) => beginWorkspaceResize("sidebar", event)}
 				/>
 				<aside className="panel hierarchy-sidebar inspector-sidebar" data-inspector={selectedHierarchyId}>
@@ -8973,7 +8974,7 @@ export default function App() {
 					)}
 					{studioAgentError && <p className="scene-save-error" role="alert">{studioAgentError}</p>}
 					{!embedMode && <div className="studio-agent-inspector" hidden={!studioAgentMode}>
-						<div className="inspector-heading"><strong>{ko("Agent", "에이전트")}</strong><button type="button" className="inspector-agent-switch" onClick={() => setStudioAgentMode(false)}>{ko("Inspector", "속성")}</button></div>
+						<div className="inspector-heading"><strong>{ko("Agent", "에이전트")}</strong><button type="button" className="inspector-agent-switch" onClick={() => setStudioAgentMode(false)}>{ko("Inspector", "속성", "属性")}</button></div>
 						<AgentPanel embedded hidden={!studioAgentMode} surface="studio" defaultCollapsed onCollapsedChange={setAgentCollapsed}
 							sceneName={scenes.find((entry) => entry.id === activeSceneId)?.name ?? ko("Untitled Scene", "제목 없는 씬")}
 							buildContext={buildStudioAgentContext} onReceipt={highlightAgentTargets}
@@ -8981,15 +8982,15 @@ export default function App() {
 					</div>}
 					<section className="inspector-pane" hidden={studioAgentMode}>
 					<div className="inspector-heading">
-						<strong>{ko("Inspector", "속성")}</strong>
+						<strong>{ko("Inspector", "속성", "属性")}</strong>
 						<button type="button" className="inspector-agent-switch" aria-pressed={studioAgentMode} onClick={() => setStudioAgentMode(true)}>{ko("Agent", "에이전트")}</button>
-						<span className="inspector-heading-selection">{selectedSceneObject ? sceneObjectNameDisplayKo(selectedSceneObject.name) : HIERARCHY_INSPECTOR_TITLES[rigSelection?.token ?? selectedHierarchyId] ?? ko("Selection", "선택 항목")}</span>
+						<span className="inspector-heading-selection">{selectedSceneObject ? sceneObjectNameDisplayKo(selectedSceneObject.name) : HIERARCHY_INSPECTOR_TITLES[rigSelection?.token ?? selectedHierarchyId] ?? ko("Selection", "선택 항목", "选中项")}</span>
 						{selectedSceneObject && (
 							<div className="inspector-actions-wrap">
 								<button
 									type="button"
 									className="inspector-actions-trigger"
-									aria-label={ko("Object actions", "오브젝트 작업")}
+									aria-label={ko("Object actions", "오브젝트 작업", "物体操作")}
 									aria-expanded={inspectorActionsOpen}
 									onClick={() => setInspectorActionsOpen((open) => !open)}
 								>
@@ -8998,10 +8999,10 @@ export default function App() {
 								{inspectorActionsOpen && (
 									<div className="inspector-actions-menu" role="menu">
 										<button type="button" role="menuitem" onClick={() => { runStudioAction("object.duplicate"); setInspectorActionsOpen(false); }}>
-											{ko("Duplicate", "복제")}
+											{ko("Duplicate", "복제", "复制")}
 										</button>
 										<button type="button" role="menuitem" onClick={() => { deleteSelectedSceneObject(); setInspectorActionsOpen(false); }}>
-											{ko("Delete", "삭제")}
+											{ko("Delete", "삭제", "删除")}
 										</button>
 									</div>
 								)}
@@ -9015,7 +9016,7 @@ export default function App() {
 					<p className="inspector-empty" data-inspector-empty role="status">
 						{ko(
 							"Select something in the hierarchy — the scene, the camera, a character, the environment or a prop — and its settings appear here.",
-							"계층에서 항목을 고르면 — 씨, 카메라, 캐릭터, 환경, 소품 — 그 설정이 여기 나타납니다.",
+							"계층에서 항목을 고르면 — 씨, 카메라, 캐릭터, 환경, 소품 — 그 설정이 여기 나타납니다.", "在层级里选一样 — 场景、相机、人物、环境或道具 — 设置会出现在这里。",
 						)}
 					</p>
 				)}
@@ -9277,7 +9278,7 @@ export default function App() {
 					</div>
 					{selectedSceneObject && (
 						<div className="inspector-footer">
-							<span>{ko("Delete or Backspace to remove", "Delete 또는 Backspace로 삭제")}</span>
+							<span>{ko("Delete or Backspace to remove", "Delete 또는 Backspace로 삭제", "Delete 或 Backspace 删除")}</span>
 						</div>
 					)}
 					</section>
@@ -9324,9 +9325,9 @@ export default function App() {
 									else if (posingIndex >= 0) castDomain.recordCharacterUndo();
 									setPosed(pose);
 									closeStudio();
-									setToast(hadMotion ? ko("Cleared the current motion and applied the pose", "현재 모션을 지우고 포즈를 적용했어요") : ko("Pose applied", "포즈를 적용했어요"));
+									setToast(hadMotion ? ko("Cleared the current motion and applied the pose", "현재 모션을 지우고 포즈를 적용했어요", "已清除当前动作并应用姿势") : ko("Pose applied", "포즈를 적용했어요", "已应用姿势"));
 								} else {
-									setToast(ko("Couldn't find the selected pose — pick again", "선택한 포즈를 찾지 못했어요. 다시 골라 주세요"));
+									setToast(ko("Couldn't find the selected pose — pick again", "선택한 포즈를 찾지 못했어요. 다시 골라 주세요", "没找到选中的姿势 — 请再选一次"));
 								}
 							}}
 							onReset={() => {
@@ -9334,7 +9335,7 @@ export default function App() {
 								else if (posingIndex >= 0) castDomain.recordCharacterUndo();
 								setStudioPick(DEFAULT_POSE.id);
 								setPosed(DEFAULT_POSE);
-								setToast(ko("Back to the default pose", "기본 포즈로 돌아왔어요"));
+								setToast(ko("Back to the default pose", "기본 포즈로 돌아왔어요", "已回到默认姿势"));
 							}}
 							onSave={savePose}
 							onPhoto={() => {
@@ -9354,18 +9355,18 @@ export default function App() {
 			<div
 				className="workspace-splitter timeline-splitter"
 				role="separator"
-				aria-label={ko("Resize frame monitor", "프레임 모니터 크기 조절")}
+				aria-label={ko("Resize frame monitor", "프레임 모니터 크기 조절", "调整帧监视器大小")}
 				onPointerDown={(event) => beginWorkspaceResize("timeline", event)}
 			/>
 			<div className="bottom-window">
-				<nav className="bottom-window-tabs" aria-label={ko("Bottom window", "하단 창")}>
+				<nav className="bottom-window-tabs" aria-label={ko("Bottom window", "하단 창", "底部窗口")}>
 					<button
 						type="button"
 						className={bottomTab === "timeline" ? "active" : ""}
 						aria-pressed={bottomTab === "timeline"}
 						onClick={() => setBottomTab("timeline")}
 					>
-						{ko("Animation", "애니메이션")}
+						{ko("Animation", "애니메이션", "动画")}
 					</button>
 					<button
 						type="button"
@@ -9373,7 +9374,7 @@ export default function App() {
 						aria-pressed={bottomTab === "assets"}
 						onClick={() => setBottomTab("assets")}
 					>
-						{ko("Assets", "에셋")}
+						{ko("Assets", "에셋", "资源")}
 					</button>
 				</nav>
 				<div className="assets-pane" hidden={bottomTab !== "assets"}>
@@ -9459,7 +9460,7 @@ export default function App() {
 				ikDisabled={!ikChains}
 				motion={motion ? {
 					frames: motion.frames,
-					label: motion.prompt || ko("Loaded take", "불러온 테이크"),
+					label: motion.prompt || ko("Loaded take", "불러온 테이크", "已载入的条"),
 					segments: motionEditLayout(motion.editSegments ?? createMotionEdit(motion.frames)),
 				} : null}
 				onMotionTrim={applyMotionTrim}
@@ -9504,13 +9505,13 @@ export default function App() {
 				onIkKeyframeRemove={ikDeleteKeyframe}
 				onBodyContactToggle={() => {
 					setBodyContact((v) => {
-						setToast(v ? ko("Body contact off — floor constraints are disabled", "바닥 접촉 꺼짐 — 바닥 제약이 비활성화됩니다") : ko("Body contact on — body markers stay above the floor", "바닥 접촉 켜짐 — 신체 접촉점이 바닥 아래로 내려가지 않습니다"));
+						setToast(v ? ko("Body contact off — floor constraints are disabled", "바닥 접촉 꺼짐 — 바닥 제약이 비활성화됩니다", "贴地已关 — 地面约束已停用") : ko("Body contact on — body markers stay above the floor", "바닥 접촉 켜짐 — 신체 접촉점이 바닥 아래로 내려가지 않습니다", "贴地已开 — 身体接触点不会落到地面以下"));
 						return !v;
 					});
 				}}
 				onFootSnapToggle={() => {
 					setFootSnap((v) => {
-				setToast(v ? ko("Foot snap off — the feet follow the body", "발 스냅 꺼짐 — 발이 몸을 따라갑니다") : ko("Foot snap on — the feet stay planted while the body moves", "발 스냅 켜짐 — 몸이 움직여도 발은 바닥에 고정됩니다"));
+				setToast(v ? ko("Foot snap off — the feet follow the body", "발 스냅 꺼짐 — 발이 몸을 따라갑니다", "脚吸附已关 — 脚会跟着身体走") : ko("Foot snap on — the feet stay planted while the body moves", "발 스냅 켜짐 — 몸이 움직여도 발은 바닥에 고정됩니다", "脚吸附已开 — 身体动时脚钉在地上"));
 						return !v;
 					});
 				}}
@@ -9574,13 +9575,13 @@ export default function App() {
 						if (patch.mode === "follow" && !motion) {
 							setToast(ko(
 								"Follow rides the subject's motion — without a loaded motion the camera composes a static frame",
-								"팔로우 카메라는 인물 모션을 따라 움직입니다 — 모션이 없으면 카메라는 정지 구도를 유지합니다",
+								"팔로우 카메라는 인물 모션을 따라 움직입니다 — 모션이 없으면 카메라는 정지 구도를 유지합니다", "跟随会跟着人物运动 — 没有加载动作时，相机会组成一个静止画面",
 							));
 						}
 						if (patch.mode === "rail" && !cameraRail) {
 							setRailDraw(true);
 							setWorkspaceLayout((current) => ({ ...current, insetCollapsed: false }));
-							setToast(ko("Draw this Camera Block's rail in the Top-View", "탑뷰에서 이 카메라 블록의 레일을 그리세요"));
+							setToast(ko("Draw this Camera Block's rail in the Top-View", "탑뷰에서 이 카메라 블록의 레일을 그리세요", "在顶视图里画这个相机块的轨道"));
 						}
 					}}
 					onCameraPreview={previewCameraShot}
@@ -9670,7 +9671,7 @@ export default function App() {
 			<Toast message={toast} onDone={() => setToast((current) => current === toast ? "" : current)} />
 			{pwaUpdate && (
 				<div className="scene-delete-toast" role="status">
-					<span>{ko("A new version of CozyClay is ready.", "CozyClay 새 버전이 준비됐어요.")}</span>
+					<span>{ko("A new version of CozyClay is ready.", "CozyClay 새 버전이 준비됐어요.", "CozyClay 新版本准备好了。")}</span>
 					<button
 						type="button"
 						onClick={() => {
@@ -9680,18 +9681,18 @@ export default function App() {
 							setPwaUpdate(null);
 						}}
 					>
-						{ko("Reload to update", "새로고침해 업데이트")}
+						{ko("Reload to update", "새로고침해 업데이트", "刷新以更新")}
 					</button>
 					<button type="button" className="ghost" onClick={() => setPwaUpdate(null)}>
-						{ko("Later", "나중에")}
+						{ko("Later", "나중에", "稍后")}
 					</button>
 				</div>
 			)}
 			{objectDeleteUndo && (
 				<div className="scene-delete-toast" role="status">
-					<span>{ko("Object deleted.", "오브젝트를 삭제했어요.")}</span>
-					<button type="button" aria-label={ko("Undo object deletion", "오브젝트 삭제 실행 취소")} onClick={undoObjectDeletion}>
-						{ko("Undo", "실행 취소")}
+					<span>{ko("Object deleted.", "오브젝트를 삭제했어요.", "已删除物体。")}</span>
+					<button type="button" aria-label={ko("Undo object deletion", "오브젝트 삭제 실행 취소", "撤销删除物体")} onClick={undoObjectDeletion}>
+						{ko("Undo", "실행 취소", "撤销")}
 					</button>
 				</div>
 			)}
@@ -9704,21 +9705,21 @@ export default function App() {
 							const record = restoreOffer;
 							setRestoreOffer(null);
 							if ((await requestHandlePermission(record.handle)) !== "granted") {
-								setToast(ko("Project access was not granted.", "프로젝트 접근이 허용되지 않았어요."));
+								setToast(ko("Project access was not granted.", "프로젝트 접근이 허용되지 않았어요.", "没有授予项目权限。"));
 								return;
 							}
 							await restoreStoredProject(record);
 						}}
 					>
-						{ko("Restore", "복원")}
+						{ko("Restore", "복원", "恢复")}
 					</button>
-					<button type="button" onClick={() => setRestoreOffer(null)} aria-label={ko("Dismiss", "닫기")}>✕</button>
+					<button type="button" onClick={() => setRestoreOffer(null)} aria-label={ko("Dismiss", "닫기", "关闭")}>✕</button>
 				</div>
 			)}
 			{assetTrash.length > 0 && assetUndoOffered && (
 				<div className="asset-delete-toast" role="status">
-					<span>{ko("Image deleted. This session can undo it.", "이미지를 삭제했어요. 이 세션에서 실행 취소할 수 있어요.")}</span>
-					<button type="button" onClick={undoDeletedAsset} disabled={Boolean(deletingAssetId)}>{ko("Undo", "실행 취소")}</button>
+					<span>{ko("Image deleted. This session can undo it.", "이미지를 삭제했어요. 이 세션에서 실행 취소할 수 있어요.", "已删除图片。这次会话里还可以撤销。")}</span>
+					<button type="button" onClick={undoDeletedAsset} disabled={Boolean(deletingAssetId)}>{ko("Undo", "실행 취소", "撤销")}</button>
 				</div>
 			)}
 			{assetDrag && (

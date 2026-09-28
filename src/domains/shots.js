@@ -301,7 +301,7 @@ export function useShots(appContext) {
 		setRailDraw(next);
 		if (next) {
 			appContext.shared.setWorkspaceLayout((current) => ({ ...current, insetCollapsed: false }));
-			appContext.notify(ko("Draw the selected Shot's rail in the Top-View", "탑뷰에서 선택한 샷의 레일을 그리세요"));
+			appContext.notify(ko("Draw the selected Shot's rail in the Top-View", "탑뷰에서 선택한 샷의 레일을 그리세요", "在顶视图里画选中镜头的轨道"));
 		}
 	}
 
@@ -309,7 +309,7 @@ export function useShots(appContext) {
 		if (!cameraRail || !activeShot) return;
 		setRailDraw(false);
 		if (!appContext.shared.runStudioAction("shot.clearCameraRail", { shotId: activeShot.id })) return;
-		appContext.notify(ko("Camera rail deleted — Follow keeps the current distance", "카메라 레일 삭제됨 — 팔로우가 현재 거리를 유지합니다"));
+		appContext.notify(ko("Camera rail deleted — Follow keeps the current distance", "카메라 레일 삭제됨 — 팔로우가 현재 거리를 유지합니다", "已删除相机轨道 — 跟随会保持当前距离"));
 	}
 
 	function previewCameraShot(shotId) {

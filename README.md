@@ -1,3 +1,5 @@
+> **简体中文分支：** [中文安装与使用说明](README.zh-CN.md)。本分支基于官方 CozyClay 1.10.0；下方的 `npx cozyclay` 安装的是官方原版，不包含本分支的汉化。
+
 <p align="center">
   <img src="docs/images/cozyclay-logo.png" alt="CozyClay" width="340">
 </p>

@@ -845,6 +845,7 @@ export function useMotion(appContext) {
 				appContext.notify((isKo, ko) => ko(
 					`Auto drop staged: the take leaves its support at ${staging.fromS.toFixed(1)}s and falls ${staging.meters.toFixed(1)}m`,
 					`자동 낙하 적용: ${staging.fromS.toFixed(1)}초에 지지면을 벗어나 ${staging.meters.toFixed(1)}m 낙하`,
+					`已安排自动坠落：片段在 ${staging.fromS.toFixed(1)} 秒脱离支撑面，下落 ${staging.meters.toFixed(1)} 米`,
 				));
 			}
 			const targetStillExists = appContext.live.characters.some((entry) => entry.id === targetCharacter.id);
@@ -922,9 +923,11 @@ export function useMotion(appContext) {
 			if (bufferOwnsTarget && !preview) setCommittedIkEdits([]);
 			if (!preview) {
 				appContext.notify((isKo, ko) =>
-					isKo
-						? `모션 로드됨: ${decoded.frames}프레임 @ ${decoded.fps} fps${hadIkKeys ? " — 이전 테이크의 IK 키는 초기화됐어요" : ""}`
-						: `Motion loaded: ${decoded.frames} frames @ ${decoded.fps} fps${hadIkKeys ? " — IK keys from the previous take were cleared" : ""}`,
+					ko(
+						`Motion loaded: ${decoded.frames} frames @ ${decoded.fps} fps${hadIkKeys ? " — IK keys from the previous take were cleared" : ""}`,
+						`모션 로드됨: ${decoded.frames}프레임 @ ${decoded.fps} fps${hadIkKeys ? " — 이전 테이크의 IK 키는 초기화됐어요" : ""}`,
+						`动作已载入：${decoded.frames} 帧 @ ${decoded.fps} fps${hadIkKeys ? "；之前的 IK 关键帧已清除" : ""}`,
+					),
 				);
 			}
 			// The applied stature, so a caller does not have to re-derive it
@@ -1012,7 +1015,7 @@ export function useMotion(appContext) {
 		setMotion({ ...full, editSegments: createMotionEdit(full.frames) });
 		appContext.shared.setTlFrameCount(full.frames);
 		appContext.shared.setTlFrame((frame) => Math.min(frame, full.frames - 1));
-		appContext.notify(ko("Full take restored", "테이크 전체 길이 복원"));
+		appContext.notify(ko("Full take restored", "테이크 전체 길이 복원", "已恢复整条"));
 	}
 
 	function editMotionSegments(edit) {
@@ -1059,14 +1062,14 @@ export function useMotion(appContext) {
 		const next = splitMotionEdit(current, appContext.shared.tlFrame);
 		if (next === current) return;
 		editMotionSegments(next);
-		appContext.notify(ko("Full-Body clip cut at the playhead", "전신 클립을 재생 헤드에서 컷했어요"));
+		appContext.notify(ko("Full-Body clip cut at the playhead", "전신 클립을 재생 헤드에서 컷했어요", "已在播放头处切开 Full-Body 片段"));
 	}
 
 	function changeMotionSegmentSpeed(id, speed) {
 		if (!motion) return;
 		const current = motion.editSegments ?? createMotionEdit(appContext.shared.motionFullRef.current.get(appContext.shared.activeChar.id)?.frames ?? motion.frames);
 		editMotionSegments(setMotionSegmentSpeed(current, id, speed));
-		appContext.notify(ko(`${speed}× speed applied to the selected segment`, `선택한 구간을 ${speed}×로 설정했어요`));
+		appContext.notify(ko(`${speed}× speed applied to the selected segment`, `선택한 구간을 ${speed}×로 설정했어요`, `已将选中片段设为 ${speed}×`));
 	}
 
 	/** Drop one Full-Body segment from the take. The removal composes like a
@@ -1076,13 +1079,13 @@ export function useMotion(appContext) {
 		if (!motion) return;
 		const current = motion.editSegments ?? createMotionEdit(appContext.shared.motionFullRef.current.get(appContext.shared.activeChar.id)?.frames ?? motion.frames);
 		if (current.length <= 1) {
-			appContext.notify(ko("The only segment cannot be deleted — use ✕ Motion to clear the take", "마지막 남은 구간은 지울 수 없어요 — ✕ 모션으로 테이크를 비워요"));
+			appContext.notify(ko("The only segment cannot be deleted — use ✕ Motion to clear the take", "마지막 남은 구간은 지울 수 없어요 — ✕ 모션으로 테이크를 비워요", "最后一段不能删 — 用 ✕ 动作清空这条"));
 			return;
 		}
 		const next = removeMotionSegment(current, id);
 		if (next === current) return;
 		editMotionSegments(next);
-		appContext.notify(ko("Segment removed — right-click a trim handle to restore the full take", "구간을 지웠어요 — 핸들 우클릭으로 전체 테이크 복원"));
+		appContext.notify(ko("Segment removed — right-click a trim handle to restore the full take", "구간을 지웠어요 — 핸들 우클릭으로 전체 테이크 복원", "已删区间 — 右键手柄可恢复整条"));
 	}
 
 	// Everyone EXCEPT the active character, posed at an absolute frame from
@@ -1139,8 +1142,8 @@ export function useMotion(appContext) {
 			}
 			setIkMode(true);
 			appContext.notify(motion
-				? ko("IK mode — correct the motion; drag end keys the fix at this frame", "IK 모드 — 모션을 보정합니다. 드래그를 끝내면 이 프레임에 보정 키가 찍혀요")
-				: ko("IK mode — drag handles in the main view; the shot camera stays frozen in the inset", "IK 모드 — 메인 뷰에서 핸들을 드래그하세요. 샷 카메라는 인셋에 고정됩니다"));
+				? ko("IK mode — correct the motion; drag end keys the fix at this frame", "IK 모드 — 모션을 보정합니다. 드래그를 끝내면 이 프레임에 보정 키가 찍혀요", "IK 模式 — 修正动作；拖完会在这一帧打下修正关键帧")
+				: ko("IK mode — drag handles in the main view; the shot camera stays frozen in the inset", "IK 모드 — 메인 뷰에서 핸들을 드래그하세요. 샷 카메라는 인셋에 고정됩니다", "IK 模式 — 在主视图拖手柄；镜头相机停在内嵌视图里"));
 			return;
 		}
 		// Exit: the keyed pose stays — the evaluate effect re-applies the
@@ -1148,7 +1151,7 @@ export function useMotion(appContext) {
 		// the user authored is lost by toggling. Untracked/unkeyed parts keep
 		// their current (FK) pose.
 		leaveIkMode();
-		appContext.notify(ko("IK mode off — keyed poses keep playing", "IK 모드 꺼짐 — 키로 찍은 포즈는 계속 재생됩니다"));
+		appContext.notify(ko("IK mode off — keyed poses keep playing", "IK 모드 꺼짐 — 키로 찍은 포즈는 계속 재생됩니다", "IK 模式已关 — 打过关键帧的姿势会继续播放"));
 	}
 
 	// Drag solve, routed by handle kind: chain targets solve the two-bone
@@ -1293,19 +1296,19 @@ export function useMotion(appContext) {
 		// and the props at this frame's placement.
 		const result = fixCollisions(appContext.shared.activeRig, ikChains, { ikState: appContext.shared.ikStateRef.current, fkJoints: ikFkJoints, blockers: externalBlockers(appContext.shared.tlFrame) });
 		if (!result.supported) {
-			appContext.notify(ko("This rig doesn't support collision cleanup", "이 리그는 신체 관통 정리를 지원하지 않아요"));
+			appContext.notify(ko("This rig doesn't support collision cleanup", "이 리그는 신체 관통 정리를 지원하지 않아요", "这个绑定不支持身体穿透清理"));
 			return;
 		}
 		if (!result.changed) {
-			appContext.notify(ko("No body collisions at this frame", "이 프레임에는 신체 관통이 없어요"));
+			appContext.notify(ko("No body collisions at this frame", "이 프레임에는 신체 관통이 없어요", "这一帧没有身体穿透"));
 			return;
 		}
 		if (appContext.shared.ikStateRef.current.tracked.size > 0) appContext.shared.castDomain.recordCharacterUndo();
 		editIkKeys(() => ikBakeKeyframe(ikChains, appContext.shared.ikStateRef.current, appContext.shared.tlFrame, ikFkJoints, result.touched, null, result.baseQuats));
 		setIkTick((n) => n + 1);
 		appContext.notify(result.residual > 1e-4
-			? ko(`Collisions reduced (residual ${(result.residual * 100).toFixed(1)} cm)`, `관통을 줄였어요 (잔여 ${(result.residual * 100).toFixed(1)} cm)`)
-			: ko(`Collisions fixed at frame ${appContext.shared.tlFrame}`, `프레임 ${appContext.shared.tlFrame}의 관통을 정리했어요`));
+			? ko(`Collisions reduced (residual ${(result.residual * 100).toFixed(1)} cm)`, `관통을 줄였어요 (잔여 ${(result.residual * 100).toFixed(1)} cm)`, `已减少穿透（残留 ${(result.residual * 100).toFixed(1)} cm)`)
+			: ko(`Collisions fixed at frame ${appContext.shared.tlFrame}`, `프레임 ${appContext.shared.tlFrame}의 관통을 정리했어요`, `已修正第 ${appContext.shared.tlFrame} 帧的身体穿插`));
 	}
 
 	// Whole-clip variant: walk the motion frame by frame, clean each pose and
@@ -1316,7 +1319,7 @@ export function useMotion(appContext) {
 		// Screened before the undo entry: an unsupported rig would record an
 		// undo step for a walk that keys nothing, leaving a no-op in history.
 		if (!appContext.shared.collisionCleanupSupported) {
-			appContext.notify(ko("This rig doesn't support collision cleanup", "이 리그는 신체 관통 정리를 지원하지 않아요"));
+			appContext.notify(ko("This rig doesn't support collision cleanup", "이 리그는 신체 관통 정리를 지원하지 않아요", "这个绑定不支持身体穿透清理"));
 			return;
 		}
 		const currentFrame = appContext.shared.tlFrame;
@@ -1374,16 +1377,16 @@ export function useMotion(appContext) {
 		// (another body and a prop, say) can come out of the walk still touching,
 		// and silence would read as "all clean".
 		const stillPenetrating = unresolved.length
-			? ko(` · ${unresolved.length} frame(s) still penetrate`, ` · ${unresolved.length}개 프레임은 남아 있어요`)
+			? ko(` · ${unresolved.length} frame(s) still penetrate`, ` · ${unresolved.length}개 프레임은 남아 있어요`, ` · 仍有 ${unresolved.length} 帧存在穿透`)
 			: "";
 		// "No body collisions" must never share a sentence with "still
 		// penetrate": a converged pass over an unfixable clip has nothing more
 		// to do, which is a different statement from the clip being clean.
 		appContext.notify((keyed.length
-			? ko(`Fixed collisions on ${keyed.length} frame(s)`, `${keyed.length}개 프레임의 관통을 정리했어요`)
+			? ko(`Fixed collisions on ${keyed.length} frame(s)`, `${keyed.length}개 프레임의 관통을 정리했어요`, `已整理 ${keyed.length} 帧的穿透`)
 			: unresolved.length
-				? ko("Nothing more to fix", "더 고칠 수 있는 게 없어요")
-				: ko("No body collisions in the clip", "클립에 신체 관통이 없어요")) + stillPenetrating);
+				? ko("Nothing more to fix", "더 고칠 수 있는 게 없어요", "没有更多可修的了")
+				: ko("No body collisions in the clip", "클립에 신체 관통이 없어요", "这段没有身体穿透")) + stillPenetrating);
 	}
 
 	function changePhysicsOptions(next) {
@@ -1401,14 +1404,14 @@ export function useMotion(appContext) {
 		appContext.shared.ikStateRef.current.tracked = new Set(physicsPreview.candidate.tracked);
 		appContext.shared.autoPhysicsRunRef.current = { motion, rig: appContext.shared.activeRig, stamp: physicsKeyStamp(appContext.shared.ikStateRef.current.keys) };
 		setPhysicsPreview(null); setIkTick((n) => n + 1);
-		appContext.notify(ko("AutoPhysics applied · Undo restores the original", "오토피직스를 적용했어요 · 실행 취소로 원본 복구"));
+		appContext.notify(ko("AutoPhysics applied · Undo restores the original", "오토피직스를 적용했어요 · 실행 취소로 원본 복구", "已应用自动物理 · 撤销可恢复原状"));
 	}
 
 	async function runAutoPhysics() {
 		if (autoPhysicsRunning || !ikChains || !appContext.shared.activeRig || !motion || appContext.shared.ikStateRef.current.rig !== appContext.shared.activeRig) return null;
 		const previous = appContext.shared.autoPhysicsRunRef.current;
 		if (previous?.motion === motion && previous.rig === appContext.shared.activeRig && previous.stamp === physicsKeyStamp(appContext.shared.ikStateRef.current.keys)) {
-			appContext.notify(ko("Already applied. Undo to review this correction again.", "이미 적용했어요. 실행 취소 후 다시 비교할 수 있어요.")); return null;
+			appContext.notify(ko("Already applied. Undo to review this correction again.", "이미 적용했어요. 실행 취소 후 다시 비교할 수 있어요.", "已经应用了。撤销后可以再对比一次。")); return null;
 		}
 		const job = ++appContext.shared.physicsJobRef.current, frame = appContext.shared.tlFrame;
 		const sourceKeys = copyPhysicsKeys(appContext.shared.ikStateRef.current.keys), stamp = physicsKeyStamp(sourceKeys);
@@ -1444,7 +1447,7 @@ export function useMotion(appContext) {
 			setPhysicsPreview(result); setPhysicsShow(true);
 			return { before: result.before, after: result.after, warnings: result.warnings, unresolved: result.unresolved, contacts: result.contacts.spans };
 		} catch (error) {
-			if (appContext.shared.physicsJobRef.current === job) appContext.notify(ko(`AutoPhysics: ${error.message}`, `오토피직스: ${error.message}`));
+			if (appContext.shared.physicsJobRef.current === job) appContext.notify(ko(`AutoPhysics: ${error.message}`, `오토피직스: ${error.message}`, `自动物理：${error.message}`));
 			return null;
 		} finally {
 			if (appContext.shared.physicsJobRef.current === job) { restore(); setAutoPhysicsRunning(false); setIkTick((n) => n + 1); }
@@ -1493,7 +1496,7 @@ export function useMotion(appContext) {
 	function downloadArdyPose() {
 		const rig = appContext.shared.posedRig();
 		if (!rig) {
-			appContext.notify(ko("Character not loaded yet", "캐릭터가 아직 로드되지 않았어요"));
+			appContext.notify(ko("Character not loaded yet", "캐릭터가 아직 로드되지 않았어요", "人物还没载入"));
 			return;
 		}
 		trackFeature("export_pose");
@@ -1516,7 +1519,7 @@ export function useMotion(appContext) {
 		a.click();
 		a.remove();
 		URL.revokeObjectURL(url);
-		appContext.notify(ko("ARDY pose exported", "ARDY 포즈 내보내기 완료"));
+		appContext.notify(ko("ARDY pose exported", "ARDY 포즈 내보내기 완료", "ARDY 姿势已导出"));
 	}
 
 	function recheckMotionHealth() {
@@ -1574,7 +1577,7 @@ export function useMotion(appContext) {
 		if (appContext.shared.generationPendingRef.current || appContext.shared.genRunningRef.current || ardyRunning) return;
 		const generationRequest = requestMotionGeneration("line_edit", "edit", { lineEdit: true });
 		if (!appContext.shared.takeSourceUrl) {
-			appContext.notify(ko("The current take has no bridge source — generate it once before editing a path", "현재 테이크에 브리지 원본이 없어요 — 궤적을 편집하기 전에 한 번 생성하세요"));
+			appContext.notify(ko("The current take has no bridge source — generate it once before editing a path", "현재 테이크에 브리지 원본이 없어요 — 궤적을 편집하기 전에 한 번 생성하세요", "当前条没有桥接源 — 编辑轨迹前请先生成一次"));
 			return;
 		}
 		// No curve object means no edit — an untouched path is the take's own
@@ -1583,14 +1586,14 @@ export function useMotion(appContext) {
 		if (!appContext.shared.lineEditPayload) {
 			appContext.notify(ko(
 				"Draw along the path, pull a dot, or pin a moment first",
-				"먼저 궤적을 따라 그리거나, 점을 잡아당기거나, 순간을 찍어 주세요",
+				"먼저 궤적을 따라 그리거나, 점을 잡아당기거나, 순간을 찍어 주세요", "请先沿路径画、拉一个点，或钉住一瞬",
 			));
 			return;
 		}
 		if (!lineEditBackend) {
 			appContext.notify(ko(
 				"The line-editing backend is not connected yet",
-				"라인 편집 백엔드가 아직 연결 전이에요",
+				"라인 편집 백엔드가 아직 연결 전이에요", "路径编辑后端还没连上",
 			));
 			return;
 		}
@@ -1645,7 +1648,7 @@ export function useMotion(appContext) {
 			.filter((clip) => clip.text.trim())
 			.sort((a, b) => a.startFrame - b.startFrame);
 		if (!clips.length) {
-			appContext.notify((isKo, ko) => ko("Add at least one Prompt Block before generating", "생성하기 전에 프롬프트 블록을 하나 이상 추가하세요"));
+			appContext.notify((isKo, ko) => ko("Add at least one Prompt Block before generating", "생성하기 전에 프롬프트 블록을 하나 이상 추가하세요", "生成前请至少加一块提示词"));
 			return;
 		}
 		const totalFrames = Math.max(...clips.map((clip) => clip.endFrame));
@@ -1686,7 +1689,7 @@ export function useMotion(appContext) {
 		const rig = appContext.shared.posing ? appContext.shared.posedRig() : appContext.shared.activeRig;
 		const rigModel = appContext.shared.posing ? (appContext.shared.posingChar?.model ?? appContext.shared.activeChar.model) : appContext.shared.activeChar.model;
 		if (!rig) {
-			appContext.notify((isKo, ko) => ko("Character not loaded yet", "캐릭터가 아직 로드되지 않았어요"));
+			appContext.notify((isKo, ko) => ko("Character not loaded yet", "캐릭터가 아직 로드되지 않았어요", "人物还没载入"));
 			return;
 		}
 		// Root guidance sends only authored sparse keys. ARDY owns every
@@ -1695,7 +1698,7 @@ export function useMotion(appContext) {
 		// values here, before any pose build or network, with a specific toast.
 		const prompt = promptOverride.trim();
 		if (!prompt) {
-			appContext.notify((isKo, ko) => ko("Motion prompt is required — describe what the subject should do before generating", "모션 프롬프트가 필요해요 — 생성 전에 피사체가 할 동작을 설명하세요"));
+			appContext.notify((isKo, ko) => ko("Motion prompt is required — describe what the subject should do before generating", "모션 프롬프트가 필요해요 — 생성 전에 피사체가 할 동작을 설명하세요", "需要动作提示词 — 生成前先写人物要做什么"));
 			return;
 		}
 		if (prompt.length > ARDY_PROMPT_MAX) {
@@ -1737,7 +1740,7 @@ export function useMotion(appContext) {
 			: [];
 		if (appContext.shared.waypointMode) {
 			if (appContext.shared.waypoints.length < 1) {
-				appContext.notify((isKo, ko) => ko("Add at least one root destination before generating", "생성하기 전에 루트 목적지를 하나 이상 추가하세요"));
+				appContext.notify((isKo, ko) => ko("Add at least one root destination before generating", "생성하기 전에 루트 목적지를 하나 이상 추가하세요", "生成前请至少加一个根目标点"));
 				return;
 			}
 			if (rootPath.length > MAX_WAYPOINTS) {
@@ -1823,7 +1826,7 @@ export function useMotion(appContext) {
 		if (pinPlan.blockedBy === PIN_BLOCKED.SCHEDULE) {
 			appContext.notify((isKo, ko) => ko(
 				"Prompt blocks and a pose start cannot be combined — generating from the prompt alone.",
-				"프롬프트 블록과 포즈 시작은 함께 쓸 수 없어요 — 프롬프트만으로 생성합니다.",
+				"프롬프트 블록과 포즈 시작은 함께 쓸 수 없어요 — 프롬프트만으로 생성합니다.", "提示词块和姿势起点不能一起用 — 只按提示词生成。",
 			));
 		}
 		const shouldPin = pinPlan.pin;
@@ -1891,7 +1894,7 @@ export function useMotion(appContext) {
 			body.historyFrames = 4 * ARDY_FPS;
 		} else if (hasBlockEdits) {
 			if (!motion?.url) {
-				appContext.notify((isKo, ko) => ko("The current motion has no bridge source; generate the prompt blocks once before regenerating IK edits", "현재 모션에 브리지 원본이 없어요. 프롬프트 블록을 한 번 생성한 뒤 IK 보정을 다시 생성하세요"));
+				appContext.notify((isKo, ko) => ko("The current motion has no bridge source; generate the prompt blocks once before regenerating IK edits", "현재 모션에 브리지 원본이 없어요. 프롬프트 블록을 한 번 생성한 뒤 IK 보정을 다시 생성하세요", "当前动作没有桥接源。请先生成一次提示词块，再重新生成 IK 修正"));
 				return;
 			}
 			const startFrame = Math.min(...editedSegments.map((segment) => segment.startFrame));
@@ -2038,14 +2041,14 @@ export function useMotion(appContext) {
 			recipeIntent: hasBlockEdits ? "carry" : "fresh",
 			recipeSeed: seed,
 			recipeLabel: hasBlockEdits
-				? ko("Block fix", "블록 수정")
+				? ko("Block fix", "블록 수정", "块修复")
 				: hasPromptSchedule
-					? ko("Blocks", "블록 생성")
+					? ko("Blocks", "블록 생성", "块生成")
 					: fresh
-						? ko("New", "새로 만들기")
+						? ko("New", "새로 만들기", "新建")
 						: motion?.url
-							? ko("Again", "다시 뽑기")
-							: ko("Generate", "생성"),
+							? ko("Again", "다시 뽑기", "再来一次")
+							: ko("Generate", "생성", "生成"),
 		}) === true;
 		return appContext.shared.generationPendingRef.current;
 	}
@@ -2125,12 +2128,12 @@ export function useMotion(appContext) {
 			return;
 		}
 		if (!motion?.url) {
-			appContext.notify(ko("The current motion has no bridge source; generate the prompt blocks once before regenerating a trail edit", "현재 모션에 브리지 원본이 없어요. 궤적 수정을 재생성하려면 프롬프트 블록을 먼저 한 번 생성하세요"));
+			appContext.notify(ko("The current motion has no bridge source; generate the prompt blocks once before regenerating a trail edit", "현재 모션에 브리지 원본이 없어요. 궤적 수정을 재생성하려면 프롬프트 블록을 먼저 한 번 생성하세요", "当前动作没有桥接源。要按轨迹修改重新生成，请先生成一次提示词块"));
 			return;
 		}
 		const rig = appContext.shared.activeRig;
 		if (!rig) {
-			appContext.notify(ko("Character not loaded yet", "캐릭터가 아직 로드되지 않았어요"));
+			appContext.notify(ko("Character not loaded yet", "캐릭터가 아직 로드되지 않았어요", "人物还没载入"));
 			return;
 		}
 		const { startFrame, endFrame } = trailEditRange(motion.frames, trailEdit.grabFrame, trailEdit.radiusFrames);
@@ -2198,7 +2201,7 @@ export function useMotion(appContext) {
 			// describe the splice (C10 excludes motionEdit from replay outright).
 			recipeIntent: "carry",
 			recipeSeed: seed,
-			recipeLabel: ko("Trail fix", "궤적 수정"),
+			recipeLabel: ko("Trail fix", "궤적 수정", "轨迹修正"),
 		});
 		if (!queued) return;
 		appContext.shared.generationPendingRef.current = true;
@@ -2229,7 +2232,7 @@ export function useMotion(appContext) {
 		job.commandContext?.signal.addEventListener("abort", abort, { once: true });
 		appContext.shared.ardyAbortRef.current = controller;
 		setArdyRunning(true);
-		reportArdyStatus(ko("connecting…", "연결 중…"));
+		reportArdyStatus(ko("connecting…", "연결 중…", "连接中…"));
 		setArdyReport(null);
 		setArdyOutcome(null);
 		// Replay notices belong to ONE run; the next run re-earns them.
@@ -2268,7 +2271,7 @@ export function useMotion(appContext) {
 					)
 				)
 			) {
-				throw new Error(ko("ARDY returned motion without verified authored IK keys", "ARDY가 검증된 수동 IK 키 없이 모션을 반환했어요"));
+				throw new Error(ko("ARDY returned motion without verified authored IK keys", "ARDY가 검증된 수동 IK 키 없이 모션을 반환했어요", "ARDY 返回了动作，但没有经过验证的手写 IK 关键帧"));
 			}
 			setArdyOutcome({ ok: true, output: done.output, bytes: done.bytes, motionUrl: done.motionUrl, rotationDeg: job.rootRotationDeg });
 			request.succeed();
@@ -2301,12 +2304,12 @@ export function useMotion(appContext) {
 			if (job.body.lineEdit && isLineEditUnsupported(err?.message)) {
 				appContext.notify(ko(
 					"The line-editing backend is not connected yet",
-					"라인 편집 백엔드가 아직 연결 전이에요",
+					"라인 편집 백엔드가 아직 연결 전이에요", "路径编辑后端还没连上",
 				));
 			}
 			setArdyOutcome({
 				ok: false,
-				message: err?.name === "AbortError" ? ko("Cancelled", "취소됨") : err?.message || String(err),
+				message: err?.name === "AbortError" ? ko("Cancelled", "취소됨", "已取消") : err?.message || String(err),
 			});
 			request.fail(err, job.body.lineEdit && isLineEditUnsupported(err?.message) ? "unsupported_route" : undefined);
 			throw err;
@@ -2394,7 +2397,7 @@ export function useMotion(appContext) {
 			motionUrl: url,
 			recipe,
 			savedAt: Date.now(),
-			label: ko("Loaded", "불러옴"),
+			label: ko("Loaded", "불러옴", "已载入"),
 		}, TAKE_VERSIONS_MAX));
 	}
 
@@ -2482,14 +2485,14 @@ export function useMotion(appContext) {
 	}
 
 	function refineDisabledReason() {
-		if (!motion) return ko("No take yet — block a scene first", "아직 테이크가 없어요 — 먼저 장면을 만들어 주세요");
-		if (!motion.url) return ko("This take has no bridge source — generate it once before refining", "이 테이크에는 브리지 원본이 없어요 — 한 번 생성해야 다듬을 수 있어요");
+		if (!motion) return ko("No take yet — block a scene first", "아직 테이크가 없어요 — 먼저 장면을 만들어 주세요", "还没有一条 — 请先走位一个场景");
+		if (!motion.url) return ko("This take has no bridge source — generate it once before refining", "이 테이크에는 브리지 원본이 없어요 — 한 번 생성해야 다듬을 수 있어요", "这条没有桥接源 — 请先生成一次才能微调");
 		return "";
 	}
 
 	function sceneDisabledReason() {
 		if (bridge === null || bridgeChecking) return motionReadinessMessage("loading");
-		if (generationBusy) return ko("A generation is already running", "이미 생성이 돌고 있어요");
+		if (generationBusy) return ko("A generation is already running", "이미 생성이 돌고 있어요", "已经在生成了");
 		// NOT a line-edit preview, deliberately. Every other reason here is a
 		// standing capability the entry should be greyed for; a draft on the
 		// viewport lasts a second and a half, and a reason line appearing and
@@ -2519,7 +2522,7 @@ export function useMotion(appContext) {
 		return sceneDisabledReason()
 			|| (ardyPrompt.trim() || appContext.shared.promptClips.some((clip) => clip.text.trim())
 				? ""
-				: ko("Describe the motion first", "먼저 어떤 동작인지 적어 주세요"));
+				: ko("Describe the motion first", "먼저 어떤 동작인지 적어 주세요", "请先写一下动作"));
 	}
 
 	/** Taking it AGAIN needs no fresh wording: the loaded take already knows what
@@ -2531,10 +2534,10 @@ export function useMotion(appContext) {
 
 	function sceneAgainDisabledReason() {
 		return sceneDisabledReason()
-			|| (motion?.url ? "" : ko("Nothing to redo yet — make a take first", "다시 뽑을 테이크가 없어요 — 먼저 한 번 만들어 주세요"))
+			|| (motion?.url ? "" : ko("Nothing to redo yet — make a take first", "다시 뽑을 테이크가 없어요 — 먼저 한 번 만들어 주세요", "还没有可重做的 — 请先做一条"))
 			|| (sceneAgainPrompt() || appContext.shared.promptClips.some((clip) => clip.text.trim())
 				? ""
-				: ko("This take carries no prompt — add a block and describe it", "이 테이크에는 프롬프트가 없어요 — 블록을 추가하고 동작을 적어 주세요"));
+				: ko("This take carries no prompt — add a block and describe it", "이 테이크에는 프롬프트가 없어요 — 블록을 추가하고 동작을 적어 주세요", "这条没有提示词 — 请加一块并写上动作"));
 	}
 
 	/** ONE CLICK from a loaded take into drag mode. The pull itself is authored

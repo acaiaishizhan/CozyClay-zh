@@ -9,17 +9,17 @@ export default function PropsPanel({
 	importMesh, sceneObjects, selectHierarchy,
 }) {
 	return (
-<Foldout hidden={selectedHierarchyId !== "props"} title={ko("Props", "소품")}>
+<Foldout hidden={selectedHierarchyId !== "props"} title={ko("Props", "소품", "道具")}>
 					<div className="props-drop" data-drop={inspectorDrop.over ? "over" : "target"} {...inspectorDrop.handlers}>
 					<p className="inspector-hint">{ko("Everything you add to the set lives here. Pick one to edit it, or click it in the shot view. Drop a picture anywhere here — or on the shot view — to stand it up as a cutout. You can also drop a .glb, .obj or .fbx to import a 3D object.", "세트에 추가한 모든 소품이 여기에 모입니다. 편집하려면 하나를 고르거나 샷 뷰에서 클릭하세요. 사진을 이 영역이나 샷 뷰에 끌어다 놓으면 컷아웃으로 세워집니다. .glb, .obj 또는 .fbx 파일을 놓으면 3D 오브젝트로 가져옵니다.")}</p>
-					<AddObjectMenu onAdd={addSceneObject} label={ko("Add object to the set", "세트에 오브젝트 추가")} />
+					<AddObjectMenu onAdd={addSceneObject} label={ko("Add object to the set", "세트에 오브젝트 추가", "往场地添加物体")} />
 					<button
 						type="button"
 						className="btn ghost full"
 						onClick={() => cutoutInputRef.current?.click()}
-						title={ko("A photo of the real thing, standing in the set as a card", "실제 사진을 판때기로 세워 세트에 배치합니다")}
+						title={ko("A photo of the real thing, standing in the set as a card", "실제 사진을 판때기로 세워 세트에 배치합니다", "把实物照片立成卡片，摆进场地")}
 					>
-						{ko("Import image as cutout", "이미지를 컷아웃으로 가져오기")}
+						{ko("Import image as cutout", "이미지를 컷아웃으로 가져오기", "导入图片为立牌")}
 					</button>
 					<button
 						type="button"

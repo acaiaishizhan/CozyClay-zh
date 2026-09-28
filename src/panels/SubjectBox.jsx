@@ -1,4 +1,4 @@
-import { ko, isKo } from "../locale.js";
+import { ko } from "../locale.js";
 
 export default function SubjectBox({ label, value, onChange, onRemove, onPose, posing, color, onColorChange, onColorEditStart }) {
 	return (
@@ -10,8 +10,8 @@ export default function SubjectBox({ label, value, onChange, onRemove, onPose, p
 						<input
 							type="color"
 							className="sb-color"
-							title={ko("Character color", "인물 색상")}
-							aria-label={ko("Character color", "인물 색상")}
+							title={ko("Character color", "인물 색상", "人物颜色")}
+							aria-label={ko("Character color", "인물 색상", "人物颜色")}
 							value={color}
 							/* Focus opens the session for keyboard/eyedropper use; the
 							   native swatch dialog can drive onChange without focus, so the
@@ -28,15 +28,15 @@ export default function SubjectBox({ label, value, onChange, onRemove, onPose, p
 						<button
 							type="button"
 							className={"cam-toggle" + (posing ? " active" : "")}
-							aria-label={isKo ? `${label} 포즈 열기` : `Open pose studio for ${label}`}
-							title={isKo ? `${label} 포즈` : `Pose ${label}`}
+							aria-label={ko(`Open pose studio for ${label}`, `${label} 포즈 열기`, `打开${label}的姿势编辑器`)}
+							title={ko(`Pose ${label}`, `${label} 포즈`, `${label}的姿势`)}
 							onClick={onPose}
 						>
 							⌘
 						</button>
 					)}
 					{onRemove && (
-						<button type="button" className="sb-remove" title={ko("Remove subject", "인물 제거")} onClick={onRemove}>
+						<button type="button" className="sb-remove" title={ko("Remove subject", "인물 제거", "移除人物")} onClick={onRemove}>
 							✕
 						</button>
 					)}

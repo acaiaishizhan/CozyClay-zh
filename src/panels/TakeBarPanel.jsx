@@ -19,20 +19,20 @@ export default function TakeBarPanel({
 				data-line-preview-url={linePreviewUrl || undefined}
 				data-take-source={takeSourceUrl || undefined}
 			>
-					<div className="take-modes" role="group" aria-label={ko("Take editing", "테이크 편집")}>
+					<div className="take-modes" role="group" aria-label={ko("Take editing", "테이크 편집", "条编辑")}>
 						{[
 							{
 								id: "scene",
-								label: ko("Scene", "장면"),
-								hint: ko("Kimodo — block it, redo it, extend it", "Kimodo — 새로 만들고, 다시 뽑고, 블록을 잇습니다"),
+								label: ko("Scene", "장면", "场景"),
+								hint: ko("Kimodo — block it, redo it, extend it", "Kimodo — 새로 만들고, 다시 뽑고, 블록을 잇습니다", "Kimodo — 先分块，再重做，再续上"),
 								reason: sceneDisabledReason(),
 								active: sceneMenuOpen,
 								onClick: () => setSceneMenuOpen((open) => !open),
 							},
 							{
 								id: "refine",
-								label: ko("Refine", "다듬기"),
-								hint: ko("ProjFlow — grab the joint's path and pull", "ProjFlow — 관절 궤적을 잡아 끌어 다듬습니다"),
+								label: ko("Refine", "다듬기", "微调"),
+								hint: ko("ProjFlow — grab the joint's path and pull", "ProjFlow — 관절 궤적을 잡아 끌어 다듬습니다", "ProjFlow — 抓住关节轨迹再拉"),
 								reason: refineDisabledReason(),
 								active: lineEditMode,
 								onClick: enterRefineMode,
@@ -63,8 +63,8 @@ export default function TakeBarPanel({
 						<div className="take-scene-menu">
 							<MotionReadiness state={readinessState} checking={bridgeChecking} onSetup={openMotionSetup} onRetry={recheckMotionHealth} />
 							{[
-								{ id: "new", label: ko("Start over", "새로 만들기"), reason: sceneGenerateDisabledReason(), onClick: () => runArdy({ fresh: true }) },
-								{ id: "again", label: ko("Take it again", "다시 뽑기"), reason: sceneAgainDisabledReason(), onClick: runSceneAgain },
+								{ id: "new", label: ko("Start over", "새로 만들기", "重新开始"), reason: sceneGenerateDisabledReason(), onClick: () => runArdy({ fresh: true }) },
+								{ id: "again", label: ko("Take it again", "다시 뽑기", "再来一条"), reason: sceneAgainDisabledReason(), onClick: runSceneAgain },
 								{ id: "block", label: isKo ? `프레임 ${tlFrame}에 블록 추가` : `Add a block at frame ${tlFrame}`, reason: "", onClick: addSceneBlock },
 							].map((action) => (
 								<div className="take-scene-action" key={action.id}>
@@ -88,8 +88,8 @@ export default function TakeBarPanel({
 							    the first thing on screen. */}
 							{motion?.url && (
 								<details className="take-scene-advanced">
-									<summary>{ko("Advanced", "고급")}</summary>
-									<Field label={ko("Keep the current take", "현재 테이크 유지")}>
+									<summary>{ko("Advanced", "고급", "高级")}</summary>
+									<Field label={ko("Keep the current take", "현재 테이크 유지", "保留当前条")}>
 										<div className="preserve-strength-row">
 											<input
 												type="range"
@@ -100,7 +100,7 @@ export default function TakeBarPanel({
 												value={preserveStrength}
 												title={ko(
 													"How hard the regeneration holds the loaded take outside the frames you edited.",
-													"수정하지 않은 프레임에서 로드된 테이크를 얼마나 강하게 유지할지 정합니다.",
+													"수정하지 않은 프레임에서 로드된 테이크를 얼마나 강하게 유지할지 정합니다.", "重生成时，在你没改的帧上有多紧地抓住已加载的那一条。",
 												)}
 												onChange={(event) => setPreserveStrength(Number(event.target.value))}
 											/>
@@ -110,8 +110,8 @@ export default function TakeBarPanel({
 										    slider value IS the preserve strength, so 0 (left) is a
 										    fresh take and 1 (right) holds the original hardest. */}
 										<p className="inspector-hint preserve-strength-scale">
-											<span>{ko("generate fresh", "새로 생성")}</span>
-											<span>{ko("keep original", "원본 유지")}</span>
+											<span>{ko("generate fresh", "새로 생성", "重新生成")}</span>
+											<span>{ko("keep original", "원본 유지", "保留原片")}</span>
 										</p>
 										{/* Round 2 allows the pair the round-1 slider refused (contract
 										    C3v2, paper 4.4), so this line no longer explains a disabled
@@ -121,7 +121,7 @@ export default function TakeBarPanel({
 											<p className="inspector-hint">
 												{ko(
 													"the drawn path replaces the root; the body keeps the take's style",
-													"경로는 새로 그려지고, 동작 스타일은 원본을 유지해요",
+													"경로는 새로 그려지고, 동작 스타일은 원본을 유지해요", "画出的路径会替换根路径；身体仍保持这条的风格",
 												)}
 											</p>
 										)}
@@ -151,7 +151,7 @@ export default function TakeBarPanel({
 					    is ever dropped from the strip by loading, so an experiment can
 					    always be walked back. */}
 					{takeVersions.length > 0 && (
-						<div className="take-version-strip" role="group" aria-label={ko("Take versions", "테이크 버전")}>
+						<div className="take-version-strip" role="group" aria-label={ko("Take versions", "테이크 버전", "条版本")}>
 							{takeVersions.map((entry, index) => (
 								<button
 									type="button"

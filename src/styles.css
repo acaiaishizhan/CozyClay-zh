@@ -40,6 +40,11 @@
 	--agent-touch: 2s;
 }
 
+html[lang="zh"] {
+	--display: "Inter", "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", system-ui, sans-serif;
+	--sans: "Inter", "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", system-ui, sans-serif;
+}
+
 * {
 	box-sizing: border-box;
 }

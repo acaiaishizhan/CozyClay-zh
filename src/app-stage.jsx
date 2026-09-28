@@ -62,11 +62,11 @@ import { shotAtFrame } from "./cuts.js";
 // lens rides, and what glass is on it. Order matters — Medium is the setup a
 // director reaches for first, so it leads.
 export const PRESETS = {
-	medium: { label: ko("Medium", "미디엄"), distance: 2.6, azimuth: 22, elevation: 6, fov: 45, targetY: 1.35, two: false },
-	wide: { label: ko("Wide", "와이드"), distance: 7, azimuth: 25, elevation: 4, fov: 38, targetY: 1.2, two: false },
-	closeup: { label: ko("Close-Up", "클로즈업"), distance: 1.3, azimuth: 16, elevation: 2, fov: 45, targetY: 1.55, two: false },
-	low: { label: ko("Low Angle", "로우 앵글"), distance: 3.5, azimuth: 20, elevation: -14, fov: 50, targetY: 1.1, two: false },
-	high: { label: ko("High Angle", "하이 앵글"), distance: 4.5, azimuth: 20, elevation: 16, fov: 45, targetY: 1.1, two: false },
+	medium: { label: ko("Medium", "미디엄", "中景"), distance: 2.6, azimuth: 22, elevation: 6, fov: 45, targetY: 1.35, two: false },
+	wide: { label: ko("Wide", "와이드", "全景"), distance: 7, azimuth: 25, elevation: 4, fov: 38, targetY: 1.2, two: false },
+	closeup: { label: ko("Close-Up", "클로즈업", "特写"), distance: 1.3, azimuth: 16, elevation: 2, fov: 45, targetY: 1.55, two: false },
+	low: { label: ko("Low Angle", "로우 앵글", "仰拍"), distance: 3.5, azimuth: 20, elevation: -14, fov: 50, targetY: 1.1, two: false },
+	high: { label: ko("High Angle", "하이 앵글", "俯拍"), distance: 4.5, azimuth: 20, elevation: 16, fov: 45, targetY: 1.1, two: false },
 };
 
 export const RIG_HIERARCHY_FOCUS = {
@@ -93,35 +93,35 @@ export const RIG_HIERARCHY_FOCUS = {
 };
 
 export const HIERARCHY_INSPECTOR_TITLES = {
-	shot: ko("Shot settings", "샷 설정"),
-	camera: ko("Camera", "카메라"),
-	light: ko("Light", "조명"),
-	characters: ko("Characters", "인물"),
-	characterA: ko("Character 1", "인물 1"),
-	rig: ko("Rig", "리그"),
-	characterB: ko("Character 2", "인물 2"),
-	environment: ko("Environment", "환경"),
-	props: ko("Props", "소품"),
-	"rig.torso": ko("Torso", "몸통"),
-	"rig.hips": ko("Root / Hips", "루트 / 엉덩이"),
-	"rig.spine": ko("Spine", "척추"),
-	"rig.chest": ko("Chest", "가슴"),
-	"rig.neck": ko("Neck", "목"),
-	"rig.head": ko("Head", "머리"),
-	"rig.leftArm": ko("Left Arm", "왼팔"),
-	"rig.leftShoulder": ko("Left Shoulder", "왼쪽 어깨"),
-	"rig.leftElbow": ko("Left Elbow", "왼쪽 팔꿈치"),
-	"rig.leftHand": ko("Left Hand", "왼손"),
-	"rig.rightArm": ko("Right Arm", "오른팔"),
-	"rig.rightShoulder": ko("Right Shoulder", "오른쪽 어깨"),
-	"rig.rightElbow": ko("Right Elbow", "오른쪽 팔꿈치"),
-	"rig.rightHand": ko("Right Hand", "오른손"),
-	"rig.leftLeg": ko("Left Leg", "왼다리"),
-	"rig.leftKnee": ko("Left Knee", "왼쪽 무릎"),
-	"rig.leftFoot": ko("Left Foot", "왼발"),
-	"rig.rightLeg": ko("Right Leg", "오른다리"),
-	"rig.rightKnee": ko("Right Knee", "오른쪽 무릎"),
-	"rig.rightFoot": ko("Right Foot", "오른발"),
+	shot: ko("Shot settings", "샷 설정", "镜头设置"),
+	camera: ko("Camera", "카메라", "相机"),
+	light: ko("Light", "조명", "灯光"),
+	characters: ko("Characters", "인물", "人物"),
+	characterA: ko("Character 1", "인물 1", "人物 1"),
+	rig: ko("Rig", "리그", "绑定"),
+	characterB: ko("Character 2", "인물 2", "人物 2"),
+	environment: ko("Environment", "환경", "环境"),
+	props: ko("Props", "소품", "道具"),
+	"rig.torso": ko("Torso", "몸통", "躯干"),
+	"rig.hips": ko("Root / Hips", "루트 / 엉덩이", "根 / 髋"),
+	"rig.spine": ko("Spine", "척추", "脊柱"),
+	"rig.chest": ko("Chest", "가슴", "胸部"),
+	"rig.neck": ko("Neck", "목", "颈"),
+	"rig.head": ko("Head", "머리", "头"),
+	"rig.leftArm": ko("Left Arm", "왼팔", "左臂"),
+	"rig.leftShoulder": ko("Left Shoulder", "왼쪽 어깨", "左肩"),
+	"rig.leftElbow": ko("Left Elbow", "왼쪽 팔꿈치", "左肘"),
+	"rig.leftHand": ko("Left Hand", "왼손", "左手"),
+	"rig.rightArm": ko("Right Arm", "오른팔", "右臂"),
+	"rig.rightShoulder": ko("Right Shoulder", "오른쪽 어깨", "右肩"),
+	"rig.rightElbow": ko("Right Elbow", "오른쪽 팔꿈치", "右肘"),
+	"rig.rightHand": ko("Right Hand", "오른손", "右手"),
+	"rig.leftLeg": ko("Left Leg", "왼다리", "左腿"),
+	"rig.leftKnee": ko("Left Knee", "왼쪽 무릎", "左膝"),
+	"rig.leftFoot": ko("Left Foot", "왼발", "左脚"),
+	"rig.rightLeg": ko("Right Leg", "오른다리", "右腿"),
+	"rig.rightKnee": ko("Right Knee", "오른쪽 무릎", "右膝"),
+	"rig.rightFoot": ko("Right Foot", "오른발", "右脚"),
 };
 
 /* ----------------------------------------- carried props (attachment) --- */
@@ -292,84 +292,84 @@ export function placeSceneObject(objects, id, placement) {
 }
 
 export const CAMERA_MOVE_LABELS_KO = new Map([
-	["Static / locked-off", ko("Static / locked-off", "고정 샷")],
-	["Zoom in", ko("Zoom in", "줌 인")],
-	["Zoom out", ko("Zoom out", "줌 아웃")],
-	["Push-in (dolly in)", ko("Push-in (dolly in)", "푸시인(돌리 인)")],
-	["Pull-out (dolly out)", ko("Pull-out (dolly out)", "풀아웃(돌리 아웃)")],
-	["Pan left", ko("Pan left", "왼쪽 팬")],
-	["Pan right", ko("Pan right", "오른쪽 팬")],
-	["Tilt up", ko("Tilt up", "틸트 업")],
-	["Tilt down", ko("Tilt down", "틸트 다운")],
-	["Tracking / follow", ko("Tracking / follow", "트래킹 / 팔로우")],
-	["Orbit / arc", ko("Orbit / arc", "오빗 / 아크")],
-	["Crane up", ko("Crane up", "크레인 업")],
-	["Crane down", ko("Crane down", "크레인 다운")],
-	["Handheld", ko("Handheld", "핸드헬드")],
-	["Crash zoom in", ko("Crash zoom in", "크래시 줌 인")],
-	["Dolly-zoom (vertigo)", ko("Dolly-zoom (vertigo)", "돌리 줌(버티고)")],
-	["Whip pan", ko("Whip pan", "휩 팬")],
-	["Aerial / drone", ko("Aerial / drone", "공중 / 드론")],
-	[CUSTOM_MOVE, ko(CUSTOM_MOVE, "직접 입력…")],
+	["Static / locked-off", ko("Static / locked-off", "고정 샷", "固定镜头")],
+	["Zoom in", ko("Zoom in", "줌 인", "变焦拉近")],
+	["Zoom out", ko("Zoom out", "줌 아웃", "变焦拉远")],
+	["Push-in (dolly in)", ko("Push-in (dolly in)", "푸시인(돌리 인)", "推进（推轨前推）")],
+	["Pull-out (dolly out)", ko("Pull-out (dolly out)", "풀아웃(돌리 아웃)", "拉远（推轨后拉）")],
+	["Pan left", ko("Pan left", "왼쪽 팬", "左摇")],
+	["Pan right", ko("Pan right", "오른쪽 팬", "右摇")],
+	["Tilt up", ko("Tilt up", "틸트 업", "上仰")],
+	["Tilt down", ko("Tilt down", "틸트 다운", "下俯")],
+	["Tracking / follow", ko("Tracking / follow", "트래킹 / 팔로우", "跟踪 / 跟随")],
+	["Orbit / arc", ko("Orbit / arc", "오빗 / 아크", "环绕 / 弧线")],
+	["Crane up", ko("Crane up", "크레인 업", "摇臂上升")],
+	["Crane down", ko("Crane down", "크레인 다운", "摇臂下降")],
+	["Handheld", ko("Handheld", "핸드헬드", "手持")],
+	["Crash zoom in", ko("Crash zoom in", "크래시 줌 인", "急推")],
+	["Dolly-zoom (vertigo)", ko("Dolly-zoom (vertigo)", "돌리 줌(버티고)", "推轨变焦（眩晕）")],
+	["Whip pan", ko("Whip pan", "휩 팬", "甩镜")],
+	["Aerial / drone", ko("Aerial / drone", "공중 / 드론", "航拍 / 无人机")],
+	[CUSTOM_MOVE, ko(CUSTOM_MOVE, "직접 입력…", "自定义…")],
 ]);
 
 export const POSE_LABELS_KO = new Map([
-	["T-pose", ko("T-pose", "T 포즈")],
-	["Relaxed", ko("Relaxed", "편안한 자세")],
-	["Contrapposto", ko("Contrapposto", "콘트라포스토")],
-	["Walking", ko("Walking", "걷는 자세")],
-	["Seated", ko("Seated", "앉은 자세")],
-	["Arms crossed", ko("Arms crossed", "팔짱")],
-	["Pointing", ko("Pointing", "가리키기")],
-	["Hands on hips", ko("Hands on hips", "허리에 손")],
-	["Looking back", ko("Looking back", "뒤돌아보기")],
-	["Hands up", ko("Hands up", "손 올리기")],
+	["T-pose", ko("T-pose", "T 포즈", "T 姿势")],
+	["Relaxed", ko("Relaxed", "편안한 자세", "放松站姿")],
+	["Contrapposto", ko("Contrapposto", "콘트라포스토", "对立站姿")],
+	["Walking", ko("Walking", "걷는 자세", "走姿")],
+	["Seated", ko("Seated", "앉은 자세", "坐姿")],
+	["Arms crossed", ko("Arms crossed", "팔짱", "抱臂")],
+	["Pointing", ko("Pointing", "가리키기", "指向")],
+	["Hands on hips", ko("Hands on hips", "허리에 손", "叉腰")],
+	["Looking back", ko("Looking back", "뒤돌아보기", "回望")],
+	["Hands up", ko("Hands up", "손 올리기", "举手")],
 ]);
 
 export const SHOT_SIZE_LABELS_KO = new Map([
-	["extreme close-up", ko("extreme close-up", "익스트림 클로즈업")],
-	["close-up", ko("close-up", "클로즈업")],
-	["medium close-up", ko("medium close-up", "미디엄 클로즈업")],
-	["medium shot", ko("medium shot", "미디엄 샷")],
-	["medium-wide shot", ko("medium-wide shot", "미디엄 와이드 샷")],
-	["wide shot", ko("wide shot", "와이드 샷")],
-	["extreme wide shot", ko("extreme wide shot", "익스트림 와이드 샷")],
+	["extreme close-up", ko("extreme close-up", "익스트림 클로즈업", "大特写")],
+	["close-up", ko("close-up", "클로즈업", "特写")],
+	["medium close-up", ko("medium close-up", "미디엄 클로즈업", "中近景")],
+	["medium shot", ko("medium shot", "미디엄 샷", "中景")],
+	["medium-wide shot", ko("medium-wide shot", "미디엄 와이드 샷", "中全景")],
+	["wide shot", ko("wide shot", "와이드 샷", "全景")],
+	["extreme wide shot", ko("extreme wide shot", "익스트림 와이드 샷", "大远景")],
 ]);
 
 export const SHOT_LEVEL_LABELS_KO = new Map([
-	["overhead", ko("overhead", "오버헤드")],
-	["high angle", ko("high angle", "하이 앵글")],
-	["eye level", ko("eye level", "아이 레벨")],
-	["chest level", ko("chest level", "가슴 높이")],
-	["hip level", ko("hip level", "엉덩이 높이")],
-	["knee level", ko("knee level", "무릎 높이")],
-	["ground level", ko("ground level", "바닥 높이")],
+	["overhead", ko("overhead", "오버헤드", "俯瞰")],
+	["high angle", ko("high angle", "하이 앵글", "俯拍")],
+	["eye level", ko("eye level", "아이 레벨", "平视")],
+	["chest level", ko("chest level", "가슴 높이", "胸高")],
+	["hip level", ko("hip level", "엉덩이 높이", "髋高")],
+	["knee level", ko("knee level", "무릎 높이", "膝高")],
+	["ground level", ko("ground level", "바닥 높이", "贴地")],
 ]);
 
 export const SCENE_RENDERER_LABELS_KO = new Map([
-	["cube", ko("cube", "큐브")],
-	["sphere", ko("sphere", "구")],
-	["capsule", ko("capsule", "캡슐")],
-	["cylinder", ko("cylinder", "원기둥")],
-	["cone", ko("cone", "원뿔")],
-	["plane", ko("plane", "평면")],
-	["chair", ko("chair", "의자")],
-	["car", ko("car", "자동차")],
-	["aircraft", ko("aircraft", "비행기")],
-	[CUTOUT_KIND, ko("cutout", "컷아웃")],
+	["cube", ko("cube", "큐브", "立方体")],
+	["sphere", ko("sphere", "구", "球")],
+	["capsule", ko("capsule", "캡슐", "胶囊")],
+	["cylinder", ko("cylinder", "원기둥", "圆柱")],
+	["cone", ko("cone", "원뿔", "圆锥")],
+	["plane", ko("plane", "평면", "平面")],
+	["chair", ko("chair", "의자", "椅子")],
+	["car", ko("car", "자동차", "汽车")],
+	["aircraft", ko("aircraft", "비행기", "飞机")],
+	[CUTOUT_KIND, ko("cutout", "컷아웃", "立牌")],
 	[MESH_KIND, ko("Mesh", "모델")],
 ]);
 
 export const SCENE_OBJECT_NAME_LABELS_KO = new Map([
-	["Cube", ko("Cube", "큐브")],
-	["Sphere", ko("Sphere", "구")],
-	["Capsule", ko("Capsule", "캡슐")],
-	["Cylinder", ko("Cylinder", "원기둥")],
-	["Cone", ko("Cone", "원뿔")],
-	["Plane", ko("Plane", "평면")],
-	["Chair", ko("Chair", "의자")],
-	["Car", ko("Car", "자동차")],
-	["Plane (aircraft)", ko("Plane (aircraft)", "비행기")],
+	["Cube", ko("Cube", "큐브", "立方体")],
+	["Sphere", ko("Sphere", "구", "球")],
+	["Capsule", ko("Capsule", "캡슐", "胶囊")],
+	["Cylinder", ko("Cylinder", "원기둥", "圆柱")],
+	["Cone", ko("Cone", "원뿔", "圆锥")],
+	["Plane", ko("Plane", "평면", "平面")],
+	["Chair", ko("Chair", "의자", "椅子")],
+	["Car", ko("Car", "자동차", "汽车")],
+	["Plane (aircraft)", ko("Plane (aircraft)", "비행기", "飞机")],
 	["Mesh", ko("Mesh", "모델")],
 	["Model", ko("Model", "모델")],
 ]);
@@ -395,11 +395,11 @@ export function sceneObjectNameDisplayKo(name) {
 }
 
 export function viewShortKo(viewShort) {
-	if (viewShort === "front") return ko("front", "정면");
-	if (viewShort === "back") return ko("back", "후면");
-	if (viewShort?.includes("profile")) return viewShort.startsWith("left") ? ko("left profile", "왼쪽 측면") : ko("right profile", "오른쪽 측면");
-	if (viewShort?.startsWith("front ¾")) return / L$/.test(viewShort) ? ko("front ¾ L", "정면 ¾ 왼쪽") : ko("front ¾ R", "정면 ¾ 오른쪽");
-	if (viewShort?.startsWith("rear ¾")) return / L$/.test(viewShort) ? ko("rear ¾ L", "후면 ¾ 왼쪽") : ko("rear ¾ R", "후면 ¾ 오른쪽");
+	if (viewShort === "front") return ko("front", "정면", "正面");
+	if (viewShort === "back") return ko("back", "후면", "背面");
+	if (viewShort?.includes("profile")) return viewShort.startsWith("left") ? ko("left profile", "왼쪽 측면", "左侧") : ko("right profile", "오른쪽 측면", "右侧");
+	if (viewShort?.startsWith("front ¾")) return / L$/.test(viewShort) ? ko("front ¾ L", "정면 ¾ 왼쪽", "正面 ¾ 左") : ko("front ¾ R", "정면 ¾ 오른쪽", "正面 ¾ 右");
+	if (viewShort?.startsWith("rear ¾")) return / L$/.test(viewShort) ? ko("rear ¾ L", "후면 ¾ 왼쪽", "背面 ¾ 左") : ko("rear ¾ R", "후면 ¾ 오른쪽", "背面 ¾ 右");
 	return viewShort;
 }
 
@@ -651,11 +651,11 @@ export const PRESERVE_TRACK_LIMBS = {
 // A fixed reading order, so the same edit always reads back the same way.
 export const PRESERVE_LIMB_ORDER = ["head", "leftArm", "rightArm", "leftLeg", "rightLeg"];
 export const preserveLimbLabel = (limb) => ({
-	head: ko("head", "머리"),
-	leftArm: ko("left arm", "왼팔"),
-	rightArm: ko("right arm", "오른팔"),
-	leftLeg: ko("left leg", "왼발"),
-	rightLeg: ko("right leg", "오른발"),
+	head: ko("head", "머리", "头"),
+	leftArm: ko("left arm", "왼팔", "左臂"),
+	rightArm: ko("right arm", "오른팔", "右臂"),
+	leftLeg: ko("left leg", "왼발", "左腿"),
+	rightLeg: ko("right leg", "오른발", "右腿"),
 }[limb]);
 
 /** One muted line naming what a grouped preserve run will regenerate, or "" when
@@ -668,7 +668,7 @@ export function preserveTracksSummary(tracks) {
 		if (limb) limbs.add(limb);
 	}
 	if (limbs.size === 0) return "";
-	if (limbs.has("body")) return ko("regenerates the whole body", "몸 전체를 다시 생성");
+	if (limbs.has("body")) return ko("regenerates the whole body", "몸 전체를 다시 생성", "会重做全身");
 	const names = PRESERVE_LIMB_ORDER.filter((limb) => limbs.has(limb)).map(preserveLimbLabel);
 	return isKo ? `${names.join("·")}만 다시 생성` : `regenerates ${names.join(" · ")} only`;
 }
@@ -2637,7 +2637,7 @@ export function loadSceneStartup() {
 				document,
 				saveBlocked: true,
 				error: null,
-				toast: ko("Saved scenes were written by a newer CozyClay — they have been left untouched and this session will not save", "저장된 장면은 더 최신 CozyClay에서 만들어졌어요. 이 세션에서는 건드리지 않고 저장도 하지 않습니다."),
+				toast: ko("Saved scenes were written by a newer CozyClay — they have been left untouched and this session will not save", "저장된 장면은 더 최신 CozyClay에서 만들어졌어요. 이 세션에서는 건드리지 않고 저장도 하지 않습니다.", "已存场景是更新版 CozyClay 写的 — 本会话不会改动它们，也不会保存"),
 			};
 		}
 		const document = result.document;
@@ -2652,7 +2652,7 @@ export function loadSceneStartup() {
 			// funnel's "scene created" step never fires for a brand-new room.
 			startupCreatedScene: result.status === "absent" || result.status === "corrupt",
 			toast: result.status === "corrupt"
-				? ko(`Saved scenes were unreadable — starting fresh; the old data is kept under ${SCENES_QUARANTINE_KEY}`, `저장된 장면을 읽을 수 없어 새로 시작합니다. 기존 데이터는 ${SCENES_QUARANTINE_KEY}에 보관했어요.`)
+				? ko(`Saved scenes were unreadable — starting fresh; the old data is kept under ${SCENES_QUARANTINE_KEY}`, `저장된 장면을 읽을 수 없어 새로 시작합니다. 기존 데이터는 ${SCENES_QUARANTINE_KEY}에 보관했어요.`, `已存场景无法读取 — 将重新开始；旧数据保留在 ${SCENES_QUARANTINE_KEY}`)
 				: result.dropped > 0
 					? (isKo ? `저장된 장면 ${result.dropped}개를 복원하지 못했어요` : `${result.dropped} saved scene(s) could not be restored`)
 					: null,

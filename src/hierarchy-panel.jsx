@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ko, isKo } from "./locale.js";
+import { ko, isKo, isZh } from "./locale.js";
 import { buildHierarchyNodes } from "./hierarchy-model.js";
 import { sceneObjectIdFromHierarchy } from "./scene-objects.js";
 import AddObjectMenu, { CatalogueEntries, displayObjectLabel } from "./object-catalog.jsx";
@@ -35,6 +35,17 @@ const HIERARCHY_LABELS_KO = {
 	Environment: "환경",
 	Props: "소품",
 	Light: "조명",
+};
+const HIERARCHY_LABELS_ZH = {
+	"SCENE 01": "场景 01", Camera: "摄影机", Characters: "人物",
+	"Character 1": "人物 1", "Character 2": "人物 2", Rig: "骨骼",
+	Torso: "躯干", "Root / Hips": "根骨 / 髋部", Spine: "脊柱",
+	Chest: "胸部", Neck: "颈部", Head: "头部",
+	"Left Arm": "左臂", "Left Shoulder": "左肩", "Left Elbow": "左肘", "Left Hand": "左手",
+	"Right Arm": "右臂", "Right Shoulder": "右肩", "Right Elbow": "右肘", "Right Hand": "右手",
+	"Left Leg": "左腿", "Left Knee": "左膝", "Left Foot": "左脚",
+	"Right Leg": "右腿", "Right Knee": "右膝", "Right Foot": "右脚",
+	Environment: "环境", Props: "道具", Light: "灯光",
 };
 
 const FALLBACK_SCENES = [{ id: "current-scene", name: "SCENE 01" }];
@@ -146,9 +157,9 @@ function HierarchyIcon({ kind, className = "" }) {
 }
 
 function displaySceneName(name) {
-	if (!isKo) return name;
+	if (!isKo && !isZh) return name;
 	const generatedName = /^SCENE\s+(\d+)$/i.exec(name);
-	return generatedName ? ko(`Scene ${generatedName[1]}`, `장면 ${generatedName[1]}`) : name;
+	return generatedName ? ko(`Scene ${generatedName[1]}`, `장면 ${generatedName[1]}`, `场景 ${generatedName[1]}`) : name;
 }
 
 /**
@@ -164,7 +175,7 @@ function displaySceneName(name) {
 function ScenePill({ scenes, activeSceneId, onSceneSelect, onSceneCreate, onRenameStart }) {
 	const options = [
 		...scenes.map((scene) => ({ value: scene.id, label: displaySceneName(scene.name) })),
-		{ value: NEW_SCENE_OPTION, label: ko("+ New scene", "+ 새 장면") },
+		{ value: NEW_SCENE_OPTION, label: ko("+ New scene", "+ 새 장면", "+ 新建场景") },
 	];
 	return (
 		// The pill sits beside the expand caret but is a different control: its
@@ -182,7 +193,7 @@ function ScenePill({ scenes, activeSceneId, onSceneSelect, onSceneCreate, onRena
 			<Dropdown
 				value={activeSceneId}
 				options={options}
-				ariaLabel={ko("Select scene", "장면 선택")}
+				ariaLabel={ko("Select scene", "장면 선택", "选择场景")}
 				onChange={(value) => {
 					if (value === NEW_SCENE_OPTION) onSceneCreate?.();
 					else if (value !== activeSceneId) onSceneSelect?.(value);
@@ -195,6 +206,7 @@ function ScenePill({ scenes, activeSceneId, onSceneSelect, onSceneCreate, onRena
 function displayHierarchyLabel(node) {
 	if (node.kind === "object") return displayObjectLabel(node.label);
 	if (node.kind === "scene") return displaySceneName(node.label);
+	if (isZh) return HIERARCHY_LABELS_ZH[node.label] ?? node.label;
 	return isKo ? (HIERARCHY_LABELS_KO[node.label] ?? node.label) : node.label;
 }
 
@@ -258,17 +270,17 @@ function RowContextMenu({ menu, onClose, onAction, onAddObject }) {
 			{menu.kind === "scene" ? (
 				<>
 					<button type="button" role="menuitem" className="hierarchy-context-item" onClick={() => onAction("rename", menu.id)}>
-						{ko("Rename", "이름 바꾸기")}
+						{ko("Rename", "이름 바꾸기", "重命名")}
 					</button>
 					<button type="button" role="menuitem" className="hierarchy-context-item" onClick={() => onAction("scene-duplicate", menu.id)}>
-						{ko("Duplicate", "복제")}
+						{ko("Duplicate", "복제", "复制")}
 					</button>
 					{menu.canDelete && (
 						<button
 							type="button"
 							role="menuitem"
 							className={"hierarchy-context-item" + (deleteArmed ? " danger" : "")}
-							title={deleteArmed ? ko("Click again to permanently delete this scene", "한 번 더 누르면 이 장면을 완전히 삭제합니다") : undefined}
+							title={deleteArmed ? ko("Click again to permanently delete this scene", "한 번 더 누르면 이 장면을 완전히 삭제합니다", "再点一次就会彻底删除这个场景") : undefined}
 							onClick={() => {
 								if (!deleteArmed) {
 									setDeleteArmed(true);
@@ -277,11 +289,11 @@ function RowContextMenu({ menu, onClose, onAction, onAddObject }) {
 								onAction("scene-delete", menu.id);
 							}}
 						>
-							{deleteArmed ? ko("Confirm delete", "삭제 확인") : ko("Delete", "삭제")}
+							{deleteArmed ? ko("Confirm delete", "삭제 확인", "确认删除") : ko("Delete", "삭제", "删除")}
 						</button>
 					)}
 					<button type="button" role="menuitem" className="hierarchy-context-item" onClick={() => onAction("scene-create", menu.id)}>
-						{ko("+ New scene", "+ 새 장면")}
+						{ko("+ New scene", "+ 새 장면", "+ 新建场景")}
 					</button>
 				</>
 			) : menu.kind === "character" ? (
@@ -294,16 +306,16 @@ function RowContextMenu({ menu, onClose, onAction, onAddObject }) {
 						{menu.hidden ? ko("Show", "표시") : ko("Hide", "숨기기")}
 					</button>
 					<button type="button" role="menuitem" className="hierarchy-context-item" onClick={() => onAction("rename", menu.id)}>
-						{ko("Rename", "이름 바꾸기")}
+						{ko("Rename", "이름 바꾸기", "重命名")}
 					</button>
 					<button type="button" role="menuitem" className="hierarchy-context-item" onClick={() => onAction("duplicate", menu.id)}>
-						{ko("Duplicate", "복제")}
+						{ko("Duplicate", "복제", "复制")}
 					</button>
 					<button type="button" role="menuitem" className="hierarchy-context-item" onClick={() => onAction("delete", menu.id)}>
-						{ko("Delete", "삭제")}
+						{ko("Delete", "삭제", "删除")}
 					</button>
 					<button type="button" role="menuitem" className="hierarchy-context-item" onClick={() => onAction("frame", menu.id)}>
-						{ko("Frame", "프레임 맞추기")}
+						{ko("Frame", "프레임 맞추기", "帧")}
 					</button>
 				</>
 			) : (
@@ -480,7 +492,7 @@ function TreeRow({
 				<button
 					type="button"
 					className="hierarchy-toggle"
-					aria-label={isKo ? `${label} ${expanded ? "접기" : "펼치기"}` : `${expanded ? "Collapse" : "Expand"} ${label}`}
+					aria-label={isZh ? `${expanded ? "收起" : "展开"}${label}` : isKo ? `${label} ${expanded ? "접기" : "펼치기"}` : `${expanded ? "Collapse" : "Expand"} ${label}`}
 					onClick={() => onToggle(node.id)}
 				>
 					{expanded ? "▾" : "▸"}
@@ -500,7 +512,7 @@ function TreeRow({
 						ref={inputRef}
 						className="hierarchy-rename-input"
 						defaultValue={node.label}
-						aria-label={isKo ? `${label} 이름 바꾸기` : `Rename ${label}`}
+						aria-label={isZh ? `重命名${label}` : isKo ? `${label} 이름 바꾸기` : `Rename ${label}`}
 						autoFocus
 						onFocus={(event) => event.currentTarget.select()}
 						onKeyDown={(event) => {
@@ -536,7 +548,7 @@ function TreeRow({
 					className="hierarchy-eye"
 					data-hidden={node.hidden ? "true" : undefined}
 					aria-pressed={node.hidden === true}
-					aria-label={node.hidden ? (isKo ? `${label} 표시` : `Show ${label}`) : (isKo ? `${label} 숨기기` : `Hide ${label}`)}
+					aria-label={node.hidden ? (isZh ? `显示${label}` : isKo ? `${label} 표시` : `Show ${label}`) : (isZh ? `隐藏${label}` : isKo ? `${label} 숨기기` : `Hide ${label}`)}
 					onClick={(event) => {
 						event.preventDefault();
 						event.stopPropagation();
@@ -674,7 +686,7 @@ export default function HierarchyPanel({
 		return null;
 	};
 	const statusFor = (id) => {
-		if (id === ikRowId && ikMode) return ko("IK ON", "IK 켜짐");
+		if (id === ikRowId && ikMode) return ko("IK ON", "IK 켜짐", "IK 开");
 		return null;
 	};
 
@@ -730,7 +742,7 @@ export default function HierarchyPanel({
 
 	const deleteActiveScene = () => {
 		if (availableScenes.length <= 1) {
-			setSceneHint(ko("At least one scene is required", "장면은 최소 하나 필요합니다"));
+			setSceneHint(ko("At least one scene is required", "장면은 최소 하나 필요합니다", "至少需要一个场景"));
 			return;
 		}
 		setSceneHint(null);
@@ -846,18 +858,18 @@ export default function HierarchyPanel({
 		});
 
 	return (
-		<section className="hierarchy-pane" aria-label={ko("Scene hierarchy", "장면 계층")}>
+		<section className="hierarchy-pane" aria-label={ko("Scene hierarchy", "장면 계층", "场景层级")}>
 			<div className="hierarchy-heading">
 				<div>
-					<span className="hierarchy-kicker">{ko("Hierarchy", "계층")}</span>
-					<strong>{ko("Scene structure", "장면 구조")}</strong>
+					<span className="hierarchy-kicker">{ko("Hierarchy", "계층", "层级")}</span>
+					<strong>{ko("Scene structure", "장면 구조", "场景结构")}</strong>
 				</div>
-				<span className="hierarchy-frame-status">{motionFrames ? (isKo ? `${motionFrames}프레임` : `${motionFrames} frames`) : ko("Blocking", "블로킹")}</span>
+				<span className="hierarchy-frame-status">{motionFrames ? ko(`${motionFrames} frames`, `${motionFrames}프레임`, `${motionFrames} 帧`) : ko("Blocking", "블로킹", "走位")}</span>
 			</div>
 			{onAddObject && (
 				<div className="hierarchy-toolbar">
 					<AddObjectMenu onAdd={onAddObject} />
-					<span className="hierarchy-frame-status">{motionFrames ? (isKo ? `${motionFrames}프레임` : `${motionFrames} frames`) : ko("Blocking", "블로킹")}</span>
+					<span className="hierarchy-frame-status">{motionFrames ? ko(`${motionFrames} frames`, `${motionFrames}프레임`, `${motionFrames} 帧`) : ko("Blocking", "블로킹", "走位")}</span>
 				</div>
 			)}
 			<div className="hierarchy-tree" role="tree" ref={treeRef} onKeyDown={onTreeKeyDown} onContextMenu={openCreateMenu}>

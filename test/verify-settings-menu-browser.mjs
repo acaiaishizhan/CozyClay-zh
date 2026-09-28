@@ -103,7 +103,7 @@ const armPressedFlip = () =>
 expect("the studio topbar renders a labelled Settings trigger", await waitFor(`!!document.querySelector('${TRIGGER}')`, 30000));
 expect(
 	"the trigger carries a text label, never an icon alone",
-	/[A-Za-z\uAC00-\uD7AF]/.test(await evaluate(`document.querySelector('${TRIGGER}').textContent`)),
+	/[A-Za-z\uAC00-\uD7AF\u3400-\u9FFF]/.test(await evaluate(`document.querySelector('${TRIGGER}').textContent`)),
 );
 
 // A stale PostHog blob and an opted-in state, so the opt-out has something to
@@ -118,9 +118,10 @@ await armMenu("open");
 await evaluate(`document.querySelector('${TRIGGER}').focus()`);
 await pressKey("Enter", "Enter", 13, "\r");
 expect("Enter on the focused trigger opens Settings", (await menuSettled()) !== "timeout");
-expect("Settings offers both languages and the analytics item", (await evaluate(
-	`[...document.querySelectorAll('.settings-menu button')].map((b) => b.dataset.testid).join(",")`,
-)) === "settings-locale-en,settings-locale-ko,settings-analytics");
+const settingsItems = await evaluate(`[...document.querySelectorAll('.settings-menu button')].map((b) => b.dataset.testid)`);
+expect("Settings offers all three languages and the analytics item",
+	["settings-locale-en", "settings-locale-ko", "settings-locale-zh", "settings-analytics"].every((id) => settingsItems.includes(id)),
+	JSON.stringify(settingsItems));
 expect(
 	"the stored language is marked pressed",
 	(await evaluate("[...document.querySelectorAll('.settings-menu button[data-testid^=settings-locale]')].filter((b) => b.getAttribute('aria-pressed') === 'true').length")) === 1,

@@ -8,12 +8,12 @@ export default function SubjectsPanel({
 	recordSessionUndo, tintSessionRef, setShowB,
 }) {
 	return (
-<Foldout hidden={!isCharacterSelection} title={showB ? ko("Subjects", "인물들") : ko("Subject", "인물")}>
+<Foldout hidden={!isCharacterSelection} title={showB ? ko("Subjects", "인물들", "人物") : ko("Subject", "인물", "人物")}>
 						<div className={"subjects-row" + (showB ? "" : " single")}>
 							{characters.map((entry, index) => entry.hidden ? null : (
 								<SubjectBox
 									key={entry.id}
-									label={ko(`Subject ${index + 1}`, `인물 ${index + 1}`)}
+									label={ko(`Subject ${index + 1}`, `인물 ${index + 1}`, `人物 ${index + 1}`)}
 									value={entry}
 									onChange={(next) => updateCharacterAt(index, next)}
 									onPose={() => openStudio(entry.id)}
@@ -30,7 +30,7 @@ export default function SubjectsPanel({
 						{!showB && (
 							<button type="button" className="add-subject" onClick={() => setShowB(true)}>
 								<span className="as-plus">＋</span>
-								<span>{ko("Add second subject", "두 번째 인물 추가")}</span>
+								<span>{ko("Add second subject", "두 번째 인물 추가", "添加第二个人物")}</span>
 							</button>
 						)}
 					</Foldout>

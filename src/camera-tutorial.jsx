@@ -45,6 +45,7 @@ export const CAMERA_TUTORIAL_STEPS = [
 			return ko(
 				<>Hold the right button and press each key once: {keys} W A S D walk, Q E crane.</>,
 				<>오른쪽 버튼을 누른 채 각 키를 한 번씩 누르세요: {keys} W A S D 이동, Q E 크레인.</>,
+				<>按住右键，每个键按一次：{keys} W A S D 移动，Q E 升降。</>,
 			);
 		},
 	},
@@ -62,17 +63,19 @@ export const CAMERA_TUTORIAL_STEPS = [
 		how: () => ko(
 			<>Hold <kbd>Alt</kbd> (<kbd>⌥ Option</kbd> on Mac) and left-drag to circle the character.</>,
 			<><kbd>Alt</kbd>(맥은 <kbd>⌥ Option</kbd>)을 누른 채 왼쪽 버튼을 끌어 캐릭터 주위를 도세요.</>,
+			<>按住 <kbd>Alt</kbd>（Mac 上为 <kbd>⌥ Option</kbd>）并用左键拖动，环绕人物。</>,
 		),
 	},
 	{
 		kind: "shot",
-		label: ko("Shot", "샷"),
+		label: ko("Shot", "샷", "镜头"),
 		// The control lives in another region than the card, so the card says
 		// which way to look before it says what to do.
 		where: ko("↓ Timeline, Shots lane", "↓ 타임라인 샷 레인"),
 		how: () => ko(
 			<>In the timeline's Shots lane click <b>+ Add shot</b>. That is your cut.</>,
 			<>타임라인의 샷 레인에서 <b>+ 샷 추가</b>를 누르세요. 그게 컷입니다.</>,
+			<>在时间轴的镜头轨点击 <b>+ 添加镜头</b>，这就创建了一次剪切。</>,
 		),
 	},
 	{
@@ -82,15 +85,17 @@ export const CAMERA_TUTORIAL_STEPS = [
 		how: () => ko(
 			<>Select the shot, click <b>Draw rail</b> in the camera bar, and drag a line across the top view. That line is the dolly move.</>,
 			<>샷을 선택하고 카메라 바의 <b>레일 그리기</b>를 누른 뒤, 탑뷰에 선을 그으세요. 그 선이 돌리 이동입니다.</>,
+			<>选中镜头，在摄影机工具栏点击 <b>画轨道</b>，然后在顶视图拖出一条线。这条线就是摄影机的移动路径。</>,
 		),
 	},
 	{
 		kind: "play",
-		label: ko("Play", "재생"),
+		label: ko("Play", "재생", "播放"),
 		where: ko("→ Viewport", "→ 뷰포트"),
 		how: () => ko(
 			<>Click <b>Look through</b> in the Shot monitor to fly the shot camera; <b>▶</b> rides the rail, <kbd>Esc</kbd> returns to the free camera.</>,
 			<>뷰포트의 <b>샷 시점</b>을 눌러 샷 카메라를 조종하세요. <b>▶</b>는 레일을 타고, <kbd>Esc</kbd>로 자유 카메라로 돌아옵니다.</>,
+			<>在镜头监看窗点击 <b>透过镜头查看</b> 来操控镜头摄影机；按 <b>▶</b> 沿轨道预览，按 <kbd>Esc</kbd> 返回自由视角。</>,
 		),
 	},
 ];
@@ -459,7 +464,7 @@ export function CameraTutorial({ previewing = false, analytics, onStepChange, on
 						{ko("Open Export", "내보내기 열기")}
 					</button>
 					<button type="button" className="camera-tutorial-handoff-dismiss" data-testid="camera-tutorial-handoff-dismiss" onClick={() => onContinue?.()}>
-						{ko("Continue editing", "편집 계속하기")}
+						{ko("Continue editing", "편집 계속하기", "继续编辑")}
 					</button>
 				</div>
 			)}

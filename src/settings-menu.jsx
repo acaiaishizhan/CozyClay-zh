@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { getAnalyticsOptOut, setAnalyticsOptOut } from "./analytics.js";
-import { LOCALE, ko, localeChosen, setLocale } from "./locale.js";
+import { LOCALE, ko, setLocale } from "./locale.js";
 
 // App settings — language and analytics — behind one labelled topbar trigger
 // (#193, docs/studio-ui-ia.md R4). Neither item edits the document, so they do
@@ -13,6 +13,7 @@ import { LOCALE, ko, localeChosen, setLocale } from "./locale.js";
 const LANGUAGES = [
 	{ id: "en", label: "English", action: "Switch to English" },
 	{ id: "ko", label: "한국어", action: "한국어로 전환" },
+	{ id: "zh", label: "简体中文", action: "切换到简体中文" },
 ];
 
 export default function SettingsMenu({ motionSetup, motionSetupReveal = 0 }) {
@@ -55,11 +56,7 @@ export default function SettingsMenu({ motionSetup, motionSetupReveal = 0 }) {
 		};
 	}, [open]);
 
-	// First-run cue: the studio starts in English even on a Korean browser, so
-	// the only visible hint that Korean exists used to be the old locale button.
-	// Until a language is stored, a ko-* browser sees the trigger in Korean.
-	const koreanBrowser = typeof navigator !== "undefined" && (navigator.language ?? "").startsWith("ko");
-	const label = !localeChosen && koreanBrowser ? "한국어" : ko("Settings", "설정");
+	const label = ko("Settings", "설정", "设置");
 
 	return (
 		<div className="settings-menu-wrap">
@@ -69,7 +66,7 @@ export default function SettingsMenu({ motionSetup, motionSetupReveal = 0 }) {
 				data-testid="settings-menu-trigger"
 				aria-expanded={open}
 				aria-haspopup="true"
-				title={ko("Language and analytics", "언어 및 사용 통계")}
+				title={ko("Language and analytics", "언어 및 사용 통계", "语言与统计")}
 				ref={triggerRef}
 				onClick={() => setOpen((value) => !value)}
 			>
@@ -77,7 +74,7 @@ export default function SettingsMenu({ motionSetup, motionSetupReveal = 0 }) {
 				<span className="caret">▾</span>
 			</button>
 			{open && (
-				<div className="project-menu settings-menu" role="group" aria-label={ko("Settings", "설정")}>
+				<div className="project-menu settings-menu" role="group" aria-label={ko("Settings", "설정", "设置")}>
 					{/* Motion readiness setup (#277): separate from privacy controls. */}
 					{motionSetup && (
 						<>
@@ -88,12 +85,12 @@ export default function SettingsMenu({ motionSetup, motionSetupReveal = 0 }) {
 								ref={setupRef}
 								onClick={() => setSetupOpen((value) => !value)}
 							>
-								{ko("Motion generation", "모션 생성")}
+							{ko("Motion generation", "모션 생성", "动作生成")}
 							</button>
 							{setupOpen && motionSetup}
 						</>
 					)}
-					<h4>{ko("Language", "언어")}</h4>
+					<h4>{ko("Language", "언어", "语言")}</h4>
 					{LANGUAGES.map((language) => (
 						<button
 							key={language.id}
@@ -107,36 +104,36 @@ export default function SettingsMenu({ motionSetup, motionSetupReveal = 0 }) {
 							<span className="mark" aria-hidden="true">{LOCALE === language.id ? "✓" : ""}</span>
 						</button>
 					))}
-					<h4>{ko("Privacy", "개인정보")}</h4>
+					<h4>{ko("Privacy", "개인정보", "隐私")}</h4>
 					<button
 						type="button"
 						data-testid="settings-analytics"
 						aria-pressed={!optedOut}
 						title={optedOut
-							? ko("Turn anonymous analytics on", "익명 사용 통계 켜기")
-							: ko("Turn anonymous analytics off", "익명 사용 통계 끄기")}
+							? ko("Turn anonymous analytics on", "익명 사용 통계 켜기", "开启匿名统计")
+							: ko("Turn anonymous analytics off", "익명 사용 통계 끄기", "关闭匿名统计")}
 						onClick={async () => {
 							const actual = await setAnalyticsOptOut(!optedOut);
 							setOptedOut(actual);
 						}}
 					>
-						{ko("Anonymous analytics", "익명 사용 통계")}
-						<span className="mark">{optedOut ? ko("off", "끔") : ko("on", "켬")}</span>
+						{ko("Anonymous analytics", "익명 사용 통계", "匿名统计")}
+						<span className="mark">{optedOut ? ko("off", "끔", "关") : ko("on", "켬", "开")}</span>
 					</button>
 					{/* Learning the camera is not a document edit and not a topbar
 					    button (R4): the tutorial opens from this closed popover, so the
 					    mode budgets in docs/studio-ui-ia.md §1 are untouched. */}
-					<h4>{ko("Help", "도움말")}</h4>
+					<h4>{ko("Help", "도움말", "帮助")}</h4>
 					<button
 						type="button"
 						data-testid="settings-camera-tutorial"
-						title={ko("Learn the camera in seven steps", "일곱 단계로 카메라 익히기")}
+						title={ko("Learn the camera in seven steps", "일곱 단계로 카메라 익히기", "七步熟悉摄影机")}
 						onClick={() => {
 							window.dispatchEvent(new CustomEvent("cozyclay:camera-tutorial", { detail: { open: true } }));
 							setOpen(false);
 						}}
 					>
-						{ko("Camera tutorial", "카메라 튜토리얼")}
+						{ko("Camera tutorial", "카메라 튜토리얼", "摄影机教程")}
 					</button>
 				</div>
 			)}
