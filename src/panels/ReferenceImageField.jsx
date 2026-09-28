@@ -42,7 +42,7 @@ export default function ReferenceImageField({ label, hint, value, alt, onPick, o
 				<span className="reference-slot-label">{label}</span>
 				{value && (
 					<button type="button" className="btn ghost small" onClick={() => { setError(""); onClear(); }}>
-						{ko("Clear", "지우기")}
+						{ko("Clear", "지우기", "清除")}
 					</button>
 				)}
 			</div>
@@ -52,7 +52,7 @@ export default function ReferenceImageField({ label, hint, value, alt, onPick, o
 					className="reference-slot-thumb"
 					data-empty={value ? undefined : "true"}
 					onClick={() => inputRef.current?.click()}
-					title={ko("Choose a reference picture", "참고 이미지를 선택합니다")}
+					title={ko("Choose a reference picture", "참고 이미지를 선택합니다", "选择参考图")}
 				>
 					{value
 						? <img src={value} alt={alt ?? label} />
@@ -61,7 +61,7 @@ export default function ReferenceImageField({ label, hint, value, alt, onPick, o
 				<div className="reference-slot-copy">
 					<p className="inspector-hint">{hint}</p>
 					<button type="button" className="btn ghost small" onClick={() => inputRef.current?.click()}>
-						{value ? ko("Replace", "교체") : ko("Choose image", "이미지 선택")}
+						{value ? ko("Replace", "교체", "替换") : ko("Choose image", "이미지 선택", "选择图片")}
 					</button>
 				</div>
 			</div>

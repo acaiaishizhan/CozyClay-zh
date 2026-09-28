@@ -4,13 +4,14 @@ import App from "./App.jsx";
 import ErrorBoundary from "./error-boundary.jsx";
 import "./styles.css";
 import { registerPwa } from "./pwa.js";
-import { LOCALE } from "./locale.js";
+import { LOCALE, ko } from "./locale.js";
 import { initAnalytics } from "./analytics.js";
 import { fetchPlaygroundProject, isPlaygroundEmbed, playgroundSceneUrl, stashPlaygroundProject } from "./playground.js";
 
 registerPwa();
 void initAnalytics();
 document.documentElement.lang = LOCALE;
+document.title = ko("CozyClay Studio — 3D staging and previs in your browser", "CozyClay Studio — 브라우저에서 장면과 카메라 프리비즈", "CozyClay 摄影棚 — 场景与镜头预演");
 
 async function boot() {
 	// The landing-page playground needs its preset in hand before the first

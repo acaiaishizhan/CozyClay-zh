@@ -7,11 +7,11 @@ import { CHARACTER_MODEL_LABELS } from "../app-stage.jsx";
 
 export default function RigPanel({ isCharacterSelection, activeChar, recordCharacterUndo, updateCharacterAt, activeCharIndex }) {
 	return (
-<Foldout hidden={!isCharacterSelection} defaultOpen={false} title={ko("Rig", "리그")}>
+<Foldout hidden={!isCharacterSelection} defaultOpen={false} title={ko("Rig", "리그", "绑定")}>
 					{/* The rig is a property of the character, and swapping it is a
 					    look decision made while blocking — so it belongs beside the
 					    subject, not buried in the project file. */}
-					<div className="rig-picker" role="radiogroup" aria-label={ko("Character rig", "캐릭터 리그")}>
+					<div className="rig-picker" role="radiogroup" aria-label={ko("Character rig", "캐릭터 리그", "人物绑定")}>
 						{CHARACTER_MODEL_IDS.map((id) => (
 							<button
 								type="button"

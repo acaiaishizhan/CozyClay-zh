@@ -171,7 +171,7 @@ export function FalMotionModal({ model, actions, onClose }) {
 							</button>
 						</div>
 						{!enabled && <p className="inspector-hint">{ko("소유자 테스트가 끝날 때까지 생성 요청은 서버에서 차단됩니다.", "Generation requests stay blocked on the server until owner testing is complete.")}</p>}
-						{falMotion.dailyRemaining !== null && <p className="inspector-hint">{ko(`오늘 남은 생성 ${falMotion.dailyRemaining}회`, `${falMotion.dailyRemaining} motion generations left today`)}</p>}
+							{falMotion.dailyRemaining !== null && <p className="inspector-hint">{ko(`오늘 남은 생성 ${falMotion.dailyRemaining}회`, `${falMotion.dailyRemaining} motion generations left today`, `今天还可生成 ${falMotion.dailyRemaining} 次动作`)}</p>}
 					</div>
 				</div>
 			</div>

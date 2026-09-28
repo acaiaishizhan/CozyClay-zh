@@ -215,9 +215,11 @@ export function useScenes(appContext) {
 	function projectProblemsNotice(problems) {
 		if (!Array.isArray(problems) || !problems.length) return "";
 		const codes = [...new Set(problems.map((problem) => problem?.code).filter(Boolean))].join(", ");
-		return isKo
-			? ` · 포함된 자원 ${problems.length}개를 건너뛰었어요${codes ? ` (${codes})` : ""}`
-			: ` · skipped ${problems.length} embedded resource${problems.length === 1 ? "" : "s"}${codes ? ` (${codes})` : ""}`;
+		return ko(
+			` · skipped ${problems.length} embedded resource${problems.length === 1 ? "" : "s"}${codes ? ` (${codes})` : ""}`,
+			` · 포함된 자원 ${problems.length}개를 건너뛰었어요${codes ? ` (${codes})` : ""}`,
+			` · 跳过 ${problems.length} 个内嵌资源${codes ? ` (${codes})` : ""}`,
+		);
 	}
 
 	async function rehydrateProjectAssets(project, warnings = []) {
@@ -281,7 +283,7 @@ export function useScenes(appContext) {
 				object_count_bucket: bucketCount(appContext.shared.projectStateRef.current.sceneObjects?.length ?? 0),
 				shot_count_bucket: bucketCount(appContext.shared.shots.length),
 			});
-			appContext.notify((isKo, ko) => isKo ? `프로젝트 저장됨: ${name}${PROJECT_EXTENSION}` : `Project saved: ${name}${PROJECT_EXTENSION}`);
+			appContext.notify((isKo, ko) => ko(`Project saved: ${name}${PROJECT_EXTENSION}`, `프로젝트 저장됨: ${name}${PROJECT_EXTENSION}`, `项目已保存：${name}${PROJECT_EXTENSION}`));
 			return { saved: true, name, fileName: downloaded ? `${name}${PROJECT_EXTENSION}` : appContext.shared.projectHandleRef.current?.name ?? `${name}${PROJECT_EXTENSION}`, downloaded };
 		} catch (err) {
 			if (err?.name === "AbortError") {
@@ -291,7 +293,7 @@ export function useScenes(appContext) {
 			setProjectSaveState("error");
 			if (err?.code === "missing-resources") setSaveBlockedReasons([{ code: err.code, items: err.items }]);
 			else if (err?.code === "resources-too-large") setSaveBlockedReasons([err]);
-			else appContext.notify(ko("Could not save the project", "프로젝트를 저장하지 못했어요"));
+			else appContext.notify(ko("Could not save the project", "프로젝트를 저장하지 못했어요", "没能保存项目"));
 			return { saved: false, failure: err?.code ?? err?.name ?? "error" };
 		}
 	}
@@ -368,7 +370,7 @@ export function useScenes(appContext) {
 			if (!file) return;
 			const result = readProjectDocument(file.text);
 			if (!result.ok) {
-				appContext.notify(isKo ? `프로젝트를 열 수 없어요: ${result.reason}` : `Cannot open project: ${result.reason}`);
+				appContext.notify(ko(`Cannot open project: ${result.reason}`, `프로젝트를 열 수 없어요: ${result.reason}`, `无法打开项目：${result.reason}`));
 				return;
 			}
 			result.project.savedAt = result.project.savedAt ?? file.savedAt ?? null;
@@ -377,11 +379,11 @@ export function useScenes(appContext) {
 			await rehydrateProjectAssets(result.project, result.warnings);
 			applyProject(result.project);
 			setProjectStartupOpen(false);
-			appContext.notify(`${isKo ? `프로젝트 열림: ${result.project.name}` : `Project opened: ${result.project.name}`}${projectProblemsNotice(result.problems)}`);
+			appContext.notify(`${ko(`Project opened: ${result.project.name}`, `프로젝트 열림: ${result.project.name}`, `项目已打开：${result.project.name}`)}${projectProblemsNotice(result.problems)}`);
 		} catch (err) {
 			if (err?.name === "AbortError") return;
 			console.error("openProject failed", err);
-			appContext.notify(ko("Could not open the project", "프로젝트를 열지 못했어요"));
+			appContext.notify(ko("Could not open the project", "프로젝트를 열지 못했어요", "没能打开项目"));
 		}
 	}
 
@@ -392,13 +394,13 @@ export function useScenes(appContext) {
 			// A stored handle may have been demoted to "prompt" since the last
 			// session (#51); this click is the user gesture that can re-grant it.
 			if ((await requestHandlePermission(handle)) !== "granted") {
-				appContext.notify(ko("Project access was not granted — allow access and try again.", "프로젝트 접근이 허용되지 않았어요. 접근을 허용하고 다시 시도해 주세요."));
+				appContext.notify(ko("Project access was not granted — allow access and try again.", "프로젝트 접근이 허용되지 않았어요. 접근을 허용하고 다시 시도해 주세요.", "没有授予项目权限 — 请允许后再试。"));
 				return;
 			}
 			const file = await readProjectFile(handle);
 			const result = readProjectDocument(file.text);
 			if (!result.ok) {
-				appContext.notify(isKo ? `프로젝트를 열 수 없어요: ${result.reason}` : `Cannot open project: ${result.reason}`);
+				appContext.notify(ko(`Cannot open project: ${result.reason}`, `프로젝트를 열 수 없어요: ${result.reason}`, `无法打开项目：${result.reason}`));
 				return;
 			}
 			result.project.savedAt = result.project.savedAt ?? file.savedAt ?? null;
@@ -408,22 +410,22 @@ export function useScenes(appContext) {
 			applyProject(result.project);
 		setProjectBrowserOpen(false);
 		setProjectStartupOpen(false);
-		appContext.notify(`${isKo ? `프로젝트 열림: ${result.project.name}` : `Project opened: ${result.project.name}`}${projectProblemsNotice(result.problems)}`);
+		appContext.notify(`${ko(`Project opened: ${result.project.name}`, `프로젝트 열림: ${result.project.name}`, `项目已打开：${result.project.name}`)}${projectProblemsNotice(result.problems)}`);
 		} catch (err) {
 			console.error("openProjectByHandle failed", err);
-			appContext.notify(ko("Could not open the project", "프로젝트를 열지 못했어요"));
+			appContext.notify(ko("Could not open the project", "프로젝트를 열지 못했어요", "没能打开项目"));
 		}
 	}
 
 	function requestNewProject() {
-		if (projectDirty && !window.confirm(ko("Discard unsaved changes and start a new project?", "저장되지 않은 변경사항을 버리고 새 프로젝트를 시작할까요?"))) return;
+		if (projectDirty && !window.confirm(ko("Discard unsaved changes and start a new project?", "저장되지 않은 변경사항을 버리고 새 프로젝트를 시작할까요?", "丢弃未保存的更改并开始新项目？"))) return;
 		setProjectNameDialog({ kind: "new", initialName: projectName ?? "My Project" });
 	}
 
 	function newProject(name) {
 		if (typeof name !== "string") return requestNewProject();
 		setProjectNameDialog(null);
-		const fresh = createSceneDocument(ko("SCENE 01", "씬 01"));
+		const fresh = createSceneDocument(ko("SCENE 01", "씬 01", "场景 01"));
 		storeWorkflowGraph(createWorkflowGraph());
 		setScenes(fresh.scenes);
 		setActiveSceneId(fresh.activeSceneId);
@@ -443,7 +445,7 @@ export function useScenes(appContext) {
 		storeProjectSession(name);
 		setProjectStartupOpen(false);
 		appContext.shared.setFirstSuccessGuideOpen(true);
-		appContext.notify(ko(`New project: ${name}`, `새 프로젝트: ${name}`));
+		appContext.notify(ko(`New project: ${name}`, `새 프로젝트: ${name}`, `新项目：${name}`));
 	}
 
 	const [restoreOffer, setRestoreOffer] = useState(null);

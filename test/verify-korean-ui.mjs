@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// Korean option locale verification.
+// Chinese-default locale verification, preserving English and Korean choices.
 //
-// English is always the default UI; Korean is opt-in only when the saved
-// localStorage choice is "ko". Browser language must never select it. This
+// Chinese is the default UI; Korean remains opt-in with the saved
+// localStorage choice "ko". Browser language must not override the choice. This
 // harness is a static file check, so it cannot set localStorage before the
 // page loads and locale.js exposes no URL/script injection hook. Instead:
 //   1. import locale.js in node with a polyfilled localStorage to exercise
@@ -29,7 +29,7 @@ function includesAll(path, values) {
 // Korean option.
 function assertKoPairsHaveBothSides(path) {
 	const text = source(path);
-	const pairs = [...text.matchAll(/ko\(\s*"((?:[^"\\]|\\.)*)"\s*,\s*"((?:[^"\\]|\\.)*)"\s*\)/g)];
+	const pairs = [...text.matchAll(/ko\(\s*"((?:[^"\\]|\\.)*)"\s*,\s*"((?:[^"\\]|\\.)*)"(?:\s*,\s*"(?:[^"\\]|\\.)*")?\s*\)/g)];
 	assert.ok(pairs.length > 0, `${path} has no ko("en", "ko") pairs to verify`);
 	for (const [, en, koText] of pairs) {
 		assert.ok(en.trim(), `${path} has an empty English default in ko(): ${koText}`);
@@ -88,24 +88,30 @@ async function loadLocaleModule(storedValue, browserLanguage = "ko-KR", storageT
 }
 
 const defaultOnKoreanBrowser = await loadLocaleModule(null, "ko-KR");
-assert.equal(defaultOnKoreanBrowser.LOCALE, "en", "a Korean browser still starts in English without a saved choice");
+assert.equal(defaultOnKoreanBrowser.LOCALE, "zh", "the Chinese fork starts in Chinese without a saved choice");
 assert.equal(defaultOnKoreanBrowser.isKo, false);
+assert.equal(defaultOnKoreanBrowser.isZh, true);
 
 const invalidStoredLocale = await loadLocaleModule("ko-KR", "ko-KR");
-assert.equal(invalidStoredLocale.LOCALE, "en", "an invalid stored value falls back to English");
+assert.equal(invalidStoredLocale.LOCALE, "zh", "an invalid stored value falls back to Chinese");
 
 const unavailableStorageLocale = await loadLocaleModule(null, "ko-KR", true);
-assert.equal(unavailableStorageLocale.LOCALE, "en", "unavailable storage falls back to English");
+assert.equal(unavailableStorageLocale.LOCALE, "zh", "unavailable storage falls back to Chinese");
 
 const localeSource = source("src/locale.js");
 assert.doesNotMatch(localeSource, /navigator\.language/, "browser language must not choose the default locale");
-assert.match(localeSource, /stored\(\) \?\? "en"/, "English remains the no-choice fallback");
+assert.match(localeSource, /stored\(\) \?\? "zh"/, "Chinese is the no-choice fallback");
 
 const enLocale = await loadLocaleModule("en");
 assert.equal(enLocale.LOCALE, "en");
 assert.equal(enLocale.isKo, false);
 assert.equal(enLocale.ko("Frame", "프레임"), "Frame");
 assert.equal(enLocale.ko("Collapse timeline", "타임라인 접기"), "Collapse timeline");
+
+const zhLocale = await loadLocaleModule("zh");
+assert.equal(zhLocale.LOCALE, "zh");
+assert.equal(zhLocale.ko("Frame", "프레임", "帧"), "帧");
+assert.equal(zhLocale.ko("Motion generation setup", "모션 생성 설정"), "动作生成设置");
 
 const koLocale = await loadLocaleModule("ko");
 assert.equal(koLocale.LOCALE, "ko");
@@ -133,13 +139,13 @@ includesAll("src/ardy/timeline.jsx", ["애니메이션 타임라인", "프롬프
 includesAll("src/posestudio.jsx", ["포즈 스튜디오", "포즈 적용", "포즈 저장"]);
 includesAll("src/ardy/waypoints.js", ["핀 사이에는 최소", "자연스럽게 걷기엔 너무 느려요", "이전 구간보다 속도가"]);
 
-// English is the default, so the document and manifest metadata are English.
+// The marketing page remains English; the installed Studio manifest is Chinese.
 const manifest = JSON.parse(source("public/manifest.webmanifest"));
-assert.equal(manifest.lang, "en");
+assert.equal(manifest.lang, "zh");
 assert.match(source("index.html"), /<html lang="en">/);
 
 // English remains intentional in the model-facing prompt contract.
 assert.match(source("src/shot.js"), /Camera move:/);
 assert.match(source("src/shot.js"), /Use the attached blocking frame ONLY/);
 
-console.log("all Korean option locale checks PASS");
+console.log("all Chinese-default and Korean-option locale checks PASS");

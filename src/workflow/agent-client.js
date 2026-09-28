@@ -156,7 +156,7 @@ const STUDIO_TOOL_LABELS = {
 	arrange_objects: ko("Arrange objects", "\uC624\uBE0C\uC81D\uD2B8 \uBC30\uCE58"),
 	arrange_characters: ko("Arrange characters", "\uCE90\uB9AD\uD130 \uBC30\uCE58"),
 	patch_elements: ko("Edit properties", "\uC18D\uC131 \uD3B8\uC9D1"),
-	frame_shot: ko("Frame the shot", "\uC0F7 \uAD6C\uB3C4 \uC7A1\uAE30"),
+	frame_shot: ko("Frame the shot", "\uC0F7 \uAD6C\uB3C4 \uC7A1\uAE30", "定好镜头构图"),
 	generate_motion: ko("Generate motion", "\uBAA8\uC158 \uC0DD\uC131"),
 	verify_result: ko("Verify the result", "\uACB0\uACFC \uAC80\uC99D"),
 	undo_edit: ko("Undo an edit", "\uD3B8\uC9D1 \uB418\uB3CC\uB9AC\uAE30"),
@@ -192,7 +192,7 @@ export const PANEL_PRESENTATIONS = Object.freeze({
 	}),
 	studio: Object.freeze({
 		toolLabels: STUDIO_TOOL_LABELS,
-		toolBadge: ko("Scene", "\uC7A5\uBA74"),
+		toolBadge: ko("Scene", "\uC7A5\uBA74", "场景"),
 		suggestions: STUDIO_SUGGESTION_CHIPS,
 		imageHint: null,
 		imageEntitlement: false,
@@ -200,7 +200,7 @@ export const PANEL_PRESENTATIONS = Object.freeze({
 		history: true,
 		persistWidth: false,
 		emptyTitle: ko("Direct the scene", "\uC7A5\uBA74\uC744 \uC5F0\uCD9C\uD558\uC138\uC694"),
-		emptyHint: (sceneName) => ko(`Ask for blocking, a camera move, or a motion take in \u201C${sceneName}\u201D.`, `\u201C${sceneName}\u201D\uC5D0\uC11C \uBE14\uB85C\uD0B9, \uCE74\uBA54\uB77C \uC6C0\uC9C1\uC784, \uBAA8\uC158 \uD14C\uC774\uD06C\uB97C \uC694\uCCAD\uD558\uC138\uC694.`),
+		emptyHint: (sceneName) => ko(`Ask for blocking, a camera move, or a motion take in \u201C${sceneName}\u201D.`, `\u201C${sceneName}\u201D\uC5D0\uC11C \uBE14\uB85C\uD0B9, \uCE74\uBA54\uB77C \uC6C0\uC9C1\uC784, \uBAA8\uC158 \uD14C\uC774\uD06C\uB97C \uC694\uCCAD\uD558\uC138\uC694.`, `你可以让智能助手为“${sceneName}”布置场景、移动摄影机或制作动作片段。`),
 		composerPlaceholder: ko("Ask the agent to block, frame or animate\u2026", "\uBE14\uB85C\uD0B9\u00B7\uAD6C\uB3C4\u00B7\uBAA8\uC158\uC744 \uC694\uCCAD\uD558\uC138\uC694\u2026"),
 	}),
 });

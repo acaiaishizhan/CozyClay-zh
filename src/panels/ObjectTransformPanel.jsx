@@ -14,11 +14,11 @@ export default function ObjectTransformPanel({
 	recentObjectColors, rememberSceneObjectColor, objectColorDraft, setObjectColorDraft,
 }) {
 	return (
-<Foldout hidden={!selectedSceneObject} title={ko("Transform", "변환")}>
+<Foldout hidden={!selectedSceneObject} title={ko("Transform", "변환", "变换")}>
 						{selectedSceneObject && (
 							<>
 								<p className="inspector-hint">
-								{ko("Type a value and press Enter, or drag a number sideways to scrub (Shift for fine).", "값을 입력하고 Enter를 누르거나 숫자를 좌우로 끌어 조절하세요(Shift는 미세 조정).")}
+								{ko("Type a value and press Enter, or drag a number sideways to scrub (Shift for fine).", "값을 입력하고 Enter를 누르거나 숫자를 좌우로 끌어 조절하세요(Shift는 미세 조정).", "输入数值后按 Enter，或左右拖数字调节（Shift 微调）。")}
 								</p>
 								<label className="check snap-toggle">
 									<input type="checkbox" checked={snapEnabled} onChange={(event) => setSnapEnabled(event.target.checked)} />
@@ -34,7 +34,7 @@ export default function ObjectTransformPanel({
 									)}
 								</span>
 								</label>
-						<Field label={ko("Name", "이름")}>
+						<Field label={ko("Name", "이름", "名称")}>
 									<input
 										type="text"
 								value={sceneObjectNameDisplayKo(selectedSceneObject.name)}
@@ -46,21 +46,21 @@ export default function ObjectTransformPanel({
 								    riding and the way off it. Detaching here is the Props drop,
 								    numbers and all. */}
 								{selectedSceneObject.attach ? (
-									<Field label={ko("Attached to", "부착 대상")}>
+									<Field label={ko("Attached to", "부착 대상", "附着到")}>
 										<div className="attach-target">
 											<span>{attachTargetLabel(selectedSceneObject.attach)}</span>
 											<button
 												type="button"
 												className="btn ghost"
 												onClick={() => hierarchyReparent.onDrop(`object:${selectedSceneObject.id}`, "props")}
-												title={ko("Put it back in the set, where it is now", "지금 있는 자리에 그대로 세트로 되돌립니다")}
+												title={ko("Put it back in the set, where it is now", "지금 있는 자리에 그대로 세트로 되돌립니다", "按现在的位置放回场地")}
 											>
-												{ko("Detach", "분리")}
+												{ko("Detach", "분리", "分离")}
 											</button>
 										</div>
 									</Field>
 								) : (
-								<Field label={ko("Parent", "상위 그룹")}>
+								<Field label={ko("Parent", "상위 그룹", "父级")}>
 									<select
 										value={selectedSceneObject.parent ?? ""}
 										onChange={(event) => {
@@ -71,7 +71,7 @@ export default function ObjectTransformPanel({
 											store.applyAtomic((objects) => setSceneObjectParent(objects, selectedSceneObject.id, parent));
 										}}
 									>
-										<option value="">{ko("(none)", "(없음)")}</option>
+										<option value="">{ko("(none)", "(없음)", "(无)")}</option>
 										{sceneObjects
 											.filter((object) => object.id !== selectedSceneObject.id)
 											.map((object) => (
@@ -81,7 +81,7 @@ export default function ObjectTransformPanel({
 								</Field>
 								)}
 								<Vector3Row
-							label={ko("Position", "위치")}
+							label={ko("Position", "위치", "位置")}
 									fields={[
 										{ axis: "X", value: selectedSceneObject.x, step: 0.05, precision: 2, scrubRange: 5, onChange: (x, token) => changeSceneObject(selectedSceneObject.id, { x }, token), onScrubStart: beginSceneTransaction, onScrubEnd: endSceneTransaction },
 										{ axis: "Y", value: selectedSceneObject.y ?? 0, step: 0.05, precision: 2, scrubRange: 5, onChange: (y, token) => changeSceneObject(selectedSceneObject.id, { y }, token), onScrubStart: beginSceneTransaction, onScrubEnd: endSceneTransaction },
@@ -89,7 +89,7 @@ export default function ObjectTransformPanel({
 									]}
 								/>
 								<Vector3Row
-							label={ko("Rotation", "회전")}
+							label={ko("Rotation", "회전", "旋转")}
 									fields={[
 										{ axis: "X", value: selectedSceneObject.rotX ?? 0, step: 1, precision: 1, scrubRange: 180, onChange: (rotX, token) => changeSceneObject(selectedSceneObject.id, { rotX }, token), onScrubStart: beginSceneTransaction, onScrubEnd: endSceneTransaction },
 										{ axis: "Y", value: selectedSceneObject.rot, step: 1, precision: 1, scrubRange: 180, onChange: (rot, token) => changeSceneObject(selectedSceneObject.id, { rot }, token), onScrubStart: beginSceneTransaction, onScrubEnd: endSceneTransaction },
@@ -97,7 +97,7 @@ export default function ObjectTransformPanel({
 									]}
 								/>
 								<Vector3Row
-							label={ko("Scale", "크기")}
+							label={ko("Scale", "크기", "缩放")}
 									fields={[
 										{ axis: "X", value: selectedSceneObject.scaleX ?? 1, step: 0.05, precision: 2, scrubRange: 4, onChange: (scaleX, token) => changeSceneObject(selectedSceneObject.id, { scaleX }, token), onScrubStart: beginSceneTransaction, onScrubEnd: endSceneTransaction },
 										{ axis: "Y", value: selectedSceneObject.scaleY ?? 1, step: 0.05, precision: 2, scrubRange: 4, onChange: (scaleY, token) => changeSceneObject(selectedSceneObject.id, { scaleY }, token), onScrubStart: beginSceneTransaction, onScrubEnd: endSceneTransaction },
@@ -129,7 +129,7 @@ export default function ObjectTransformPanel({
 								)}
 								{selectedSceneObject.renderer === CUTOUT_KIND && (
 									<>
-										<Field label={ko("Card height (m)", "판 높이 (m)")}>
+										<Field label={ko("Card height (m)", "판 높이 (m)", "立牌高度 (m)")}>
 											<input
 												type="number"
 												data-field="cutout-height"
@@ -139,7 +139,7 @@ export default function ObjectTransformPanel({
 												onChange={(event) => changeSceneObject(selectedSceneObject.id, { height: Number(event.target.value) })}
 											/>
 										</Field>
-										<Field label={ko("Card width (m)", "판 너비 (m)")}>
+										<Field label={ko("Card width (m)", "판 너비 (m)", "立牌宽度 (m)")}>
 											<input
 												type="number"
 												data-field="cutout-width"
@@ -173,7 +173,7 @@ export default function ObjectTransformPanel({
 												<p className="inspector-hint matte-state">
 													{ko(
 														"This card's background is removed. You are editing the original photograph — apply again to change what goes.",
-														"이 카드는 배경이 지워진 상태입니다. 지금 보이는 것은 원본 사진이며, 다시 적용하면 지워지는 범위가 바뀝니다.",
+														"이 카드는 배경이 지워진 상태입니다. 지금 보이는 것은 원본 사진이며, 다시 적용하면 지워지는 범위가 바뀝니다.", "这张卡的背景已去掉。你在编辑原图 — 再应用一次即可改掉要去掉的部分。",
 													)}
 												</p>
 											)}
@@ -185,7 +185,7 @@ export default function ObjectTransformPanel({
 												// key meaning two different undos in two different panels is
 												// worse than a key that means one thing everywhere.
 												tabIndex={0}
-												aria-label={ko("Background editor — drag over the background to cut it out", "배경 편집기 — 배경 위를 드래그하면 그 영역이 잘려 나갑니다")}
+												aria-label={ko("Background editor — drag over the background to cut it out", "배경 편집기 — 배경 위를 드래그하면 그 영역이 잘려 나갑니다", "背景编辑器 — 在背景上拖动即可抠掉那一块")}
 											/>
 											<p className="inspector-hint">
 												{matteStats.painted
@@ -194,7 +194,7 @@ export default function ObjectTransformPanel({
 														: `${Math.round(matteStats.coverage * 100)}% of the picture marked — purple is what goes.`
 													: ko(
 															"Drag over the background — the cut grows out from wherever the brush touches.",
-															"배경 위를 드래그하세요 — 브러시가 닿은 곳에서 같은 배경으로 번져 나가며 잘립니다.",
+															"배경 위를 드래그하세요 — 브러시가 닿은 곳에서 같은 배경으로 번져 나가며 잘립니다.", "在背景上拖 — 笔刷碰到的地方会向外扩开抠掉。",
 														)}
 											</p>
 										</div>
@@ -212,7 +212,7 @@ export default function ObjectTransformPanel({
 														matteEditorRef.current?.setMode("paint");
 													}}
 												>
-													{ko("Cut out", "누끼 따기")}
+													{ko("Cut out", "누끼 따기", "抠图")}
 												</button>
 												<button
 													type="button"
@@ -222,7 +222,7 @@ export default function ObjectTransformPanel({
 														matteEditorRef.current?.setMode("erase");
 													}}
 												>
-													{ko("Bring back", "되살리기")}
+													{ko("Bring back", "되살리기", "恢复")}
 												</button>
 											</div>
 											{/* Icons, not words: undo, redo and clear are the same three
@@ -235,8 +235,8 @@ export default function ObjectTransformPanel({
 													<button
 														type="button"
 														disabled={!matteStats.canUndo}
-														title={ko("Undo", "실행 취소")}
-														aria-label={ko("Undo", "실행 취소")}
+														title={ko("Undo", "실행 취소", "撤销")}
+														aria-label={ko("Undo", "실행 취소", "撤销")}
 														onClick={() => matteEditorRef.current?.undo()}
 													>
 														<span aria-hidden="true">↩️</span>
@@ -244,8 +244,8 @@ export default function ObjectTransformPanel({
 													<button
 														type="button"
 														disabled={!matteStats.canRedo}
-														title={ko("Redo", "다시 실행")}
-														aria-label={ko("Redo", "다시 실행")}
+														title={ko("Redo", "다시 실행", "重做")}
+														aria-label={ko("Redo", "다시 실행", "重做")}
 														onClick={() => matteEditorRef.current?.redo()}
 													>
 														<span aria-hidden="true">↪️</span>
@@ -254,8 +254,8 @@ export default function ObjectTransformPanel({
 												<div className="presets matte-modes matte-icons matte-clear">
 													<button
 														type="button"
-														title={ko("Clear the selection", "선택 모두 지우기")}
-														aria-label={ko("Clear the selection", "선택 모두 지우기")}
+														title={ko("Clear the selection", "선택 모두 지우기", "清除选择")}
+														aria-label={ko("Clear the selection", "선택 모두 지우기", "清除选择")}
 														onClick={() => matteEditorRef.current?.clear()}
 													>
 														<span aria-hidden="true">🗑️</span>
@@ -264,7 +264,7 @@ export default function ObjectTransformPanel({
 											</div>
 										</div>
 										<div className="matte-slider">
-											<label htmlFor="matte-tolerance">{ko("Tolerance", "허용치")}</label>
+											<label htmlFor="matte-tolerance">{ko("Tolerance", "허용치", "容差")}</label>
 											<input
 												id="matte-tolerance"
 												type="range"
@@ -285,7 +285,7 @@ export default function ObjectTransformPanel({
 												max="0.6"
 												step="0.01"
 												value={matteTolerance}
-												aria-label={ko("Tolerance", "허용치")}
+												aria-label={ko("Tolerance", "허용치", "容差")}
 												onChange={(event) => {
 													const value = Number(event.target.value);
 													if (!Number.isFinite(value)) return;
@@ -294,7 +294,7 @@ export default function ObjectTransformPanel({
 												}}
 											/>
 										<div className="matte-slider">
-											<label htmlFor="matte-brush">{ko("Brush", "붓 크기")}</label>
+											<label htmlFor="matte-brush">{ko("Brush", "붓 크기", "笔刷")}</label>
 											<input
 												id="matte-brush"
 												type="range"
@@ -315,7 +315,7 @@ export default function ObjectTransformPanel({
 												max="200"
 												step="1"
 												value={matteBrush}
-												aria-label={ko("Brush size", "붓 크기")}
+												aria-label={ko("Brush size", "붓 크기", "笔刷大小")}
 												onChange={(event) => {
 													const value = Number(event.target.value);
 													if (!Number.isFinite(value)) return;
@@ -325,7 +325,7 @@ export default function ObjectTransformPanel({
 											/>
 										</div>
 										<div className="matte-slider">
-											<label htmlFor="matte-shrink">{ko("Edge shrink", "가장자리 먹기")}</label>
+											<label htmlFor="matte-shrink">{ko("Edge shrink", "가장자리 먹기", "边缘内收")}</label>
 											<input
 												id="matte-shrink"
 												type="range"
@@ -342,7 +342,7 @@ export default function ObjectTransformPanel({
 												max="3"
 												step="0.5"
 												value={matteShrink}
-												aria-label={ko("Edge shrink", "가장자리 먹기")}
+												aria-label={ko("Edge shrink", "가장자리 먹기", "边缘内收")}
 												onChange={(event) => {
 													const value = Number(event.target.value);
 													if (Number.isFinite(value)) setMatteShrink(value);
@@ -350,7 +350,7 @@ export default function ObjectTransformPanel({
 											/>
 										</div>
 										<div className="matte-slider">
-											<label htmlFor="matte-feather">{ko("Edge feather", "가장자리 부드럽게")}</label>
+											<label htmlFor="matte-feather">{ko("Edge feather", "가장자리 부드럽게", "边缘羽化")}</label>
 											<input
 												id="matte-feather"
 												type="range"
@@ -367,7 +367,7 @@ export default function ObjectTransformPanel({
 												max="3"
 												step="0.5"
 												value={matteFeather}
-												aria-label={ko("Edge feather", "가장자리 부드럽게")}
+												aria-label={ko("Edge feather", "가장자리 부드럽게", "边缘羽化")}
 												onChange={(event) => {
 													const value = Number(event.target.value);
 													if (Number.isFinite(value)) setMatteFeather(value);
@@ -378,7 +378,7 @@ export default function ObjectTransformPanel({
 										<p className="inspector-hint">
 											{ko(
 												"Tolerance is how far a drag spreads: low keeps to one flat colour, high walks across a shaded wall. It applies to the next drag and to Auto-detect, not to what is already purple.",
-												"허용치는 드래그가 얼마나 번질지입니다. 낮으면 한 가지 색에 머무르고, 높으면 명암이 변하는 벽까지 따라갑니다. 이미 칠한 보라가 아니라 다음 드래그와 자동 인식에 적용됩니다.",
+												"허용치는 드래그가 얼마나 번질지입니다. 낮으면 한 가지 색에 머무르고, 높으면 명암이 변하는 벽까지 따라갑니다. 이미 칠한 보라가 아니라 다음 드래그와 자동 인식에 적용됩니다.", "容差是一次拖开的范围：低则守住一块平色，高则穿过有明暗的墙。只作用于下一次拖和自动识别，不影响已经是紫色的部分。",
 											)}
 										</p>
 										<button
@@ -395,7 +395,7 @@ export default function ObjectTransformPanel({
 												}
 											}}
 										>
-											{ko("Auto-detect background", "배경 자동 인식")}
+											{ko("Auto-detect background", "배경 자동 인식", "自动识别背景")}
 										</button>
 										<button
 											type="button"
@@ -404,17 +404,17 @@ export default function ObjectTransformPanel({
 											onClick={() => applyMatte(selectedSceneObject.id)}
 										>
 											{matteBusy
-												? ko("Removing…", "지우는 중…")
+												? ko("Removing…", "지우는 중…", "清除中…")
 												: matteStats.painted
 													? isKo
 														? `보라색 부분 지우기 — 사진의 ${Math.round(matteStats.coverage * 100)}%`
 														: `Remove what is purple — ${Math.round(matteStats.coverage * 100)}% of the picture`
-													: ko("Nothing is marked yet", "아직 선택된 부분이 없습니다")}
+													: ko("Nothing is marked yet", "아직 선택된 부분이 없습니다", "还没有选中任何部分")}
 										</button>
 										<p className="inspector-hint">
 											{ko(
 												"Cut out grows the selection from wherever you drag; Bring back is the same growth fenced to what is already selected, so one drag returns a wrongly-cut region whole. Applying removes exactly what is purple and trims the empty margin — the card keeps the original photograph and this selection, so you can come back and change your mind.",
-												"누끼 따기는 드래그한 자리에서 선택 영역을 키우고, 되살리기는 그 성장을 이미 선택된 범위 안으로 가둔 것이라 잘못 잘린 부분이 드래그 한 번에 통째로 돌아옵니다. 적용하면 보라색 부분만 지우고 여백을 잘라냅니다 — 원본 사진과 지금 선택한 영역은 카드에 남아 있어 언제든 다시 열어 고칠 수 있습니다.",
+												"누끼 따기는 드래그한 자리에서 선택 영역을 키우고, 되살리기는 그 성장을 이미 선택된 범위 안으로 가둔 것이라 잘못 잘린 부분이 드래그 한 번에 통째로 돌아옵니다. 적용하면 보라색 부분만 지우고 여백을 잘라냅니다 — 원본 사진과 지금 선택한 영역은 카드에 남아 있어 언제든 다시 열어 고칠 수 있습니다.", "抠图从你拖的地方扩大选区；还原是同样的扩大但限制在已选范围内，所以一拖就能整块找回切错的区域。应用后只去掉紫色并裁掉空边 — 卡片还留着原图和这次选择，随时能回来改。",
 											)}
 										</p>
 									</>
@@ -426,16 +426,16 @@ export default function ObjectTransformPanel({
 										<summary
 										className="object-color current"
 										style={{ background: selectedSceneObject.color }}
-										aria-label={ko("Object colour", "오브젝트 색상")}
-										title={ko("Object colour", "오브젝트 색상")}
+										aria-label={ko("Object colour", "오브젝트 색상", "物体颜色")}
+										title={ko("Object colour", "오브젝트 색상", "物体颜色")}
 									/>
 									{/* The displayed color while auto-color mode is on — the "hex"
 									    made visible. Computed inline off the RAW object; the swatch
 									    above keeps showing the authored color it returns to. */}
 									{autoColor && (
-										<span className="auto-color-hex">{ko("auto ", "자동 ")}{autoColorHex(selectedSceneObject.id)}</span>
+										<span className="auto-color-hex">{ko("auto ", "자동 ", "自动 ")}{autoColorHex(selectedSceneObject.id)}</span>
 									)}
-									<div className="object-colors" role="group" aria-label={ko("Object colour", "오브젝트 색상")}>
+									<div className="object-colors" role="group" aria-label={ko("Object colour", "오브젝트 색상", "物体颜色")}>
 										{OBJECT_COLORS.map((color) => (
 											<button
 												type="button"
@@ -479,8 +479,8 @@ export default function ObjectTransformPanel({
 											type="color"
 											className="object-color object-color-free"
 											value={normalizeObjectColor(selectedSceneObject.color) ?? "#ffffff"}
-											title={ko("Custom colour", "직접 고른 색상")}
-											aria-label={ko("Custom colour", "직접 고른 색상")}
+											title={ko("Custom colour", "직접 고른 색상", "自定义颜色")}
+											aria-label={ko("Custom colour", "직접 고른 색상", "自定义颜色")}
 											onChange={(event) => {
 												const color = normalizeObjectColor(event.target.value);
 												if (!color) return;
@@ -498,8 +498,8 @@ export default function ObjectTransformPanel({
 											spellCheck={false}
 											maxLength={7}
 											placeholder="#rrggbb"
-											title={ko("Colour hex", "색상 hex")}
-											aria-label={ko("Colour hex", "색상 hex")}
+											title={ko("Colour hex", "색상 hex", "颜色 hex")}
+											aria-label={ko("Colour hex", "색상 hex", "颜色 hex")}
 											onChange={(event) => {
 												setObjectColorDraft(event.target.value);
 												const color = normalizeObjectColor(event.target.value);

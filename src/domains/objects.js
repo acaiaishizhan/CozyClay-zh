@@ -140,7 +140,7 @@ export function useObjects(appContext) {
 		if (!object) return;
 		const patch = dropToSurfacePatch(object, sceneObjects.filter((item) => item.id !== object.id), appContext.shared.characters);
 		if (patch === null) {
-			appContext.notify(ko("Nothing to drop", "내려놓을 대상이 없어요"));
+			appContext.notify(ko("Nothing to drop", "내려놓을 대상이 없어요", "没有可放下的"));
 			return;
 		}
 		changeSceneObject(object.id, patch);
@@ -197,7 +197,7 @@ export function useObjects(appContext) {
 	 * goes, the rest is the user's own name for the thing. */
 	function cutoutNameFromFile(fileName) {
 		const base = String(fileName ?? "").replace(/\.[^.]+$/, "").trim();
-		return base || ko("Cutout", "컷아웃");
+		return base || ko("Cutout", "컷아웃", "立牌");
 	}
 
 	/**
@@ -249,7 +249,7 @@ export function useObjects(appContext) {
 		appContext.shared.markCraftAction("cutout");
 		const record = await assetRecord(assetId);
 		if (!record) {
-			appContext.notify(ko("That image is no longer stored", "그 이미지는 더 이상 저장되어 있지 않아요"));
+			appContext.notify(ko("That image is no longer stored", "그 이미지는 더 이상 저장되어 있지 않아요", "那张图已经不在了"));
 			return;
 		}
 		const object = createCutoutObject(
@@ -389,7 +389,7 @@ export function useObjects(appContext) {
 		try {
 			const sourceId = object.sourceAssetId || object.assetId;
 			const source = await assetRecord(sourceId);
-			if (!source) throw new Error(ko("its picture is missing from the store", "저장소에 사진이 없습니다"));
+			if (!source) throw new Error(ko("its picture is missing from the store", "저장소에 사진이 없습니다", "仓库里找不到它的图片"));
 			const [cut, matte] = await Promise.all([
 				cutOutBackground(source, { mask: options.mask, shrink: matteShrink, feather: matteFeather }),
 				maskAsset(options.mask, { width: options.maskWidth, height: options.maskHeight, name: `${source.name || "cutout"} matte` }),
@@ -486,15 +486,15 @@ export function useObjects(appContext) {
 	function attachTargetLabel(attach) {
 		const index = appContext.shared.characters.findIndex((entry) => entry.id === attach.characterId);
 		const who = index < 0
-			? ko("Missing character", "없는 인물")
+			? ko("Missing character", "없는 인물", "缺少人物")
 			: index === 0
-				? ko("Character 1", "인물 1")
+				? ko("Character 1", "인물 1", "人物 1")
 				: index === 1
-					? ko("Character 2", "인물 2")
+					? ko("Character 2", "인물 2", "人物 2")
 					: isKo ? `인물 ${index + 1}` : `Character ${index + 1}`;
 		const bone = attach.bone
 			? HIERARCHY_INSPECTOR_TITLES[`rig.${attach.bone}`] ?? attach.bone
-			: ko("Root", "루트");
+			: ko("Root", "루트", "根");
 		return `${who} · ${bone}`;
 	}
 

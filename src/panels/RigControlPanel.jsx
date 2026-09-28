@@ -14,19 +14,19 @@ export default function RigControlPanel({
 	bridgeChecking, bridge, runTrailRegeneration, trailReadinessState, openMotionSetup, recheckMotionHealth,
 }) {
 	return (
-<Foldout hidden={!isRigSelection} title={ko("Rig Control", "리그 제어")}>
+<Foldout hidden={!isRigSelection} title={ko("Rig Control", "리그 제어", "绑定控制")}>
 						<p className="inspector-hint">
 							{rigSelection && rigSelection.token !== "rig"
 							? (isKo ? `${HIERARCHY_INSPECTOR_TITLES[rigSelection.token]}이 활성 제어 그룹입니다.` : `${HIERARCHY_INSPECTOR_TITLES[rigSelection.token]} is the active control group.`)
-							: ko("Choose a body group in the hierarchy, then manipulate its handle in the main view.", "계층에서 몸 그룹을 고른 뒤 메인 뷰의 핸들을 조작하세요.")}
+							: ko("Choose a body group in the hierarchy, then manipulate its handle in the main view.", "계층에서 몸 그룹을 고른 뒤 메인 뷰의 핸들을 조작하세요.", "在层级里选一个身体组，再在主视图里拖它的手柄。")}
 						</p>
 						<div className="inspector-status-grid">
-						<span>{ko("Rig", "리그")}</span><b>{ikChains ? ko("Ready", "준비됨") : ko("Unavailable", "사용 불가")}</b>
-						<span>{ko("Focus", "초점")}</span><b>{ikFocus ?? ko("None", "없음")}</b>
-						<span>{ko("Foot lock", "발 고정")}</span><b>{footSnap ? ko("ON", "켜짐") : ko("OFF", "꺼짐")}</b>
+						<span>{ko("Rig", "리그", "绑定")}</span><b>{ikChains ? ko("Ready", "준비됨", "就绪") : ko("Unavailable", "사용 불가", "不可用")}</b>
+						<span>{ko("Focus", "초점", "对焦")}</span><b>{ikFocus ?? ko("None", "없음", "无")}</b>
+						<span>{ko("Foot lock", "발 고정", "锁脚")}</span><b>{footSnap ? ko("ON", "켜짐", "开") : ko("OFF", "꺼짐", "关")}</b>
 						</div>
 						<button type="button" className={"btn full" + (ikMode ? " primary" : "")} onClick={toggleIkMode} disabled={!ikChains}>
-						{ikMode ? ko("Finish rig editing", "리그 편집 끝내기") : ko("Edit rig with IK", "IK로 리그 편집")}
+						{ikMode ? ko("Finish rig editing", "리그 편집 끝내기", "结束绑定编辑") : ko("Edit rig with IK", "IK로 리그 편집", "用 IK 编辑绑定")}
 						</button>
 						{/* Self-collision cleanup. Hidden outright on a rig whose capsule
 						    proxies cannot be built: a button whose only answer is "not
@@ -35,13 +35,13 @@ export default function RigControlPanel({
 						{collisionCleanupSupported && (
 							<>
 								<button type="button" className="btn full" onClick={runFixCollisions} disabled={!ikChains}>
-								{ko("Fix body collisions (this frame)", "콜리전 수정 (이 프레임)")}
+								{ko("Fix body collisions (this frame)", "콜리전 수정 (이 프레임)", "修正身体穿透（这一帧）")}
 								</button>
 								<button type="button" className="btn full" onClick={runFixCollisionsRange} disabled={!ikChains || !motion}>
-								{ko("Fix body collisions (whole clip)", "콜리전 수정 (클립 전체)")}
+								{ko("Fix body collisions (whole clip)", "콜리전 수정 (클립 전체)", "修正身体穿透（整段）")}
 								</button>
 								<p className="inspector-hint">
-								{ko("Pushes interpenetrating body parts apart with IK and keys the fix. Whole clip walks the loaded motion and keys only the frames that changed.", "콜리전 수정은 겹쳐 들어간 신체 파츠를 IK로 밀어내고 그 결과를 키로 남깁니다. 클립 전체는 로드된 모션을 훑으며 실제로 고쳐진 프레임만 키를 찍습니다.")}
+								{ko("Pushes interpenetrating body parts apart with IK and keys the fix. Whole clip walks the loaded motion and keys only the frames that changed.", "콜리전 수정은 겹쳐 들어간 신체 파츠를 IK로 밀어내고 그 결과를 키로 남깁니다. 클립 전체는 로드된 모션을 훑으며 실제로 고쳐진 프레임만 키를 찍습니다.", "用 IK 把互相穿插的身体部位推开，并打下修正关键帧。整段会扫过已载入的动作，只在真正改过的帧打关键帧。")}
 								</p>
 							</>
 						)}
@@ -65,7 +65,7 @@ export default function RigControlPanel({
 										aria-pressed={ikEditTool === "ik"}
 										onClick={() => setIkEditTool("ik")}
 									>
-										{ko("IK 파츠 편집", "IK parts")}
+										{ko("IK 파츠 편집", "IK parts", "IK 部件编辑")}
 									</button>
 									<button
 										type="button"
@@ -74,13 +74,13 @@ export default function RigControlPanel({
 										disabled={!showTrails}
 										onClick={() => setIkEditTool("trail")}
 									>
-										{ko("궤적선 편집", "Motion trail")}
+										{ko("궤적선 편집", "Motion trail", "轨迹线编辑")}
 									</button>
 								</div>
 								<p className="inspector-hint">
 									{ikEditTool === "ik"
-										? ko("파츠를 직접 잡아 손·발·팔꿈치·무릎을 세밀하게 수정합니다. 궤적선은 안내선으로만 표시됩니다.", "Grab a body part for detailed IK editing. Trails are guides only.")
-										: ko("궤적선을 잡아 여러 프레임의 이동을 함께 수정합니다. 파츠 핸들은 잠시 잠겨 겹침을 막습니다.", "Grab a trail to edit a range of frames. IK handles are locked to avoid overlapping picks.")}
+										? ko("파츠를 직접 잡아 손·발·팔꿈치·무릎을 세밀하게 수정합니다. 궤적선은 안내선으로만 표시됩니다.", "Grab a body part for detailed IK editing. Trails are guides only.", "直接抓住部件，精细调整手、脚、肘、膝。轨迹线只作参考。")
+										: ko("궤적선을 잡아 여러 프레임의 이동을 함께 수정합니다. 파츠 핸들은 잠시 잠겨 겹침을 막습니다.", "Grab a trail to edit a range of frames. IK handles are locked to avoid overlapping picks.", "抓住轨迹线，一次改多帧的位移。部件手柄会暂时锁住，避免点重。")}
 								</p>
 								<button
 									type="button"
@@ -91,9 +91,9 @@ export default function RigControlPanel({
 										setIkEditTool("ik");
 									}}
 								>
-									{ko(`궤적선 ${showTrails ? "표시" : "숨김"}`, `Trails ${showTrails ? "on" : "off"}`)}
+									{ko(`궤적선 ${showTrails ? "표시" : "숨김"}`, `Trails ${showTrails ? "on" : "off"}`, `运动轨迹${showTrails ? "显示" : "隐藏"}`)}
 								</button>
-								<Field label={ko("Trail falloff", "궤적 영향 범위")}>
+								<Field label={ko("Trail falloff", "궤적 영향 범위", "轨迹影响范围")}>
 									<div className="trail-falloff-row">
 										<input
 											type="range"
@@ -111,19 +111,19 @@ export default function RigControlPanel({
 									className="btn primary full trail-regenerate"
 									disabled={!trailEdit || !motion?.url || generationBusy || bridgeChecking || bridge === null}
 									title={!trailEdit
-										? ko("Drag the trajectory line in the viewport first", "먼저 뷰포트에서 궤적선을 끌어 수정하세요")
+										? ko("Drag the trajectory line in the viewport first", "먼저 뷰포트에서 궤적선을 끌어 수정하세요", "请先在视口里拖轨迹线")
 										: !motion?.url
-											? ko("The take has no bridge source to regenerate from", "재생성할 브리지 원본이 없는 테이크예요")
+											? ko("The take has no bridge source to regenerate from", "재생성할 브리지 원본이 없는 테이크예요", "这条没有可用来重新生成的桥接源")
 											: ""}
 									onClick={runTrailRegeneration}
 								>
-									{ko("Regenerate from trail edit", "궤적 수정으로 재생성")}
+									{ko("Regenerate from trail edit", "궤적 수정으로 재생성", "按轨迹修改重新生成")}
 								</button>
 								<MotionReadiness state={trailReadinessState} checking={bridgeChecking} onSetup={() => openMotionSetup("trail")} onRetry={recheckMotionHealth} />
 								<p className="inspector-hint">
 									{ko(
 										"Grab any point of the trajectory line to bend the motion; nearby frames follow within the falloff range. Confirm to regenerate that span with Kimodo — explicit IK keys stay pinned exactly.",
-										"궤적선의 아무 지점이나 잡아 끌면 영향 범위 안의 주변 프레임이 함께 따라와요. 재생성을 누르면 그 구간을 Kimodo가 다시 생성하고, 명시적으로 잡은 IK 키는 정확히 고정됩니다.",
+										"궤적선의 아무 지점이나 잡아 끌면 영향 범위 안의 주변 프레임이 함께 따라와요. 재생성을 누르면 그 구간을 Kimodo가 다시 생성하고, 명시적으로 잡은 IK 키는 정확히 고정됩니다.", "抓住轨迹线上任意点即可弯曲动作；附近帧会在衰减范围内跟着。确认后用 Kimodo 重生成这一段 — 明确的 IK 关键帧仍精确钉住。",
 									)}
 								</p>
 							</>

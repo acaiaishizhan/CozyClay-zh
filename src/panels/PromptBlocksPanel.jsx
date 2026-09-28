@@ -16,8 +16,8 @@ export default function PromptBlocksPanel({
 	readinessState, runStudioAction, ardyRunning, cancelArdy, ardyStatus, ardyOutcome, addPromptClip, tlFrame,
 }) {
 	return (
-<Foldout hidden={!isCharacterSelection} defaultOpen={false} openSignal={promptBlocksReveal} title={ko("Prompt Blocks", "프롬프트 블록")}>
-					<p className="inspector-hint">{ko("Blocks define what ARDY generates over each frame range. Selecting one also moves editing context to that prompt.", "블록은 각 프레임 범위에서 ARDY가 생성할 내용을 정합니다. 블록을 선택하면 편집 기준도 해당 프롬프트로 이동합니다.")}</p>
+<Foldout hidden={!isCharacterSelection} defaultOpen={false} openSignal={promptBlocksReveal} title={ko("Prompt Blocks", "프롬프트 블록", "提示词块")}>
+					<p className="inspector-hint">{ko("Blocks define what ARDY generates over each frame range. Selecting one also moves editing context to that prompt.", "블록은 각 프레임 범위에서 ARDY가 생성할 내용을 정합니다. 블록을 선택하면 편집 기준도 해당 프롬프트로 이동합니다.", "块决定 ARDY 在每段帧范围内生成什么。选中一块，编辑也会切到对应提示词。")}</p>
 						<div className="inspector-list">
 							{promptClips.map((clip) => (
 								<button
@@ -30,13 +30,13 @@ export default function PromptBlocksPanel({
 										setTlFrame(Math.min(clip.startFrame, tlFrameCount - 1));
 									}}
 								>
-								<span>{clip.text || ko("Untitled motion", "이름 없는 모션")}</span>
+								<span>{clip.text || ko("Untitled motion", "이름 없는 모션", "未命名动作")}</span>
 									<small>{clip.startFrame}–{clip.endFrame}f</small>
 								</button>
 							))}
 						</div>
 						{selectedPromptId && (
-						<Field label={ko("Selected block prompt", "선택한 블록 프롬프트")}>
+						<Field label={ko("Selected block prompt", "선택한 블록 프롬프트", "选中块的提示词")}>
 								<input
 									type="text"
 									value={promptClips.find((clip) => clip.id === selectedPromptId)?.text ?? ""}
@@ -44,19 +44,19 @@ export default function PromptBlocksPanel({
 										changePromptClip(selectedPromptId, event.target.value);
 										setArdyPrompt(event.target.value);
 									}}
-								placeholder={ko("describe this motion block", "이 모션 블록을 설명하세요")}
+								placeholder={ko("describe this motion block", "이 모션 블록을 설명하세요", "描述这块动作")}
 								/>
 							</Field>
 						)}
 						{/* The seed belongs with the button that consumes it. Duration does
 						    not appear at all: the blocks' own frame ranges are the length. */}
-						<Field label={ko("Seed", "시드")}>
+						<Field label={ko("Seed", "시드", "种子")}>
 							<input
 								type="text"
 								inputMode="numeric"
 								value={ardySeed}
 								onChange={(e) => changeArdySeed(e.target.value)}
-								placeholder={ko("empty = random", "비우면 랜덤")}
+								placeholder={ko("empty = random", "비우면 랜덤", "留空则随机")}
 							/>
 						</Field>
 						{/* Scheduled inpainting used to live here, beside the batch button.
@@ -70,17 +70,17 @@ export default function PromptBlocksPanel({
 						    bridge source, so the whole section is absent until there is one
 						    rather than present and inert. */}
 						{motion?.url && (
-							<Field label={ko("Line editing", "라인 편집")}>
+							<Field label={ko("Line editing", "라인 편집", "轨迹编辑")}>
 								<button
 									type="button"
 									className={"btn full" + (lineEditMode ? " primary" : "")}
 									title={ko(
 										"The joint's own path is drawn on the viewport — grab a point on it and pull, or draw a new path on empty space; the joint then follows it exactly. The view still orbits normally (Alt+drag).",
-										"관절이 지나가는 궤적이 뷰포트에 그려집니다 — 궤적 위의 점을 잡아 끌거나, 빈 곳에 새 궤적을 그리면 관절이 그 경로를 정확히 따라갑니다. 시점은 평소처럼 돌릴 수 있어요 (Alt+드래그).",
+										"관절이 지나가는 궤적이 뷰포트에 그려집니다 — 궤적 위의 점을 잡아 끌거나, 빈 곳에 새 궤적을 그리면 관절이 그 경로를 정확히 따라갑니다. 시점은 평소처럼 돌릴 수 있어요 (Alt+드래그).", "视口上画着这个关节自己的路径 — 抓住点拉，或在空白处画新路径；关节会严格跟着走。视角仍可正常环绕（Alt+拖）。",
 									)}
 									onClick={toggleLineEditMode}
 								>
-									{lineEditMode ? ko("Path editing on", "궤적 편집 켜짐") : ko("Drag the path", "궤적을 잡아 끌기")}
+									{lineEditMode ? ko("Path editing on", "궤적 편집 켜짐", "轨迹编辑已开") : ko("Drag the path", "궤적을 잡아 끌기", "拖动轨迹")}
 								</button>
 								{lineEditMode && (
 									<div
@@ -91,12 +91,12 @@ export default function PromptBlocksPanel({
 										// read the state from whichever of the two it is looking at.
 										data-line-drift={lineCurve && lineDrifted ? "true" : undefined}
 									>
-										<Field label={ko("Joint", "관절")}>
+										<Field label={ko("Joint", "관절", "关节")}>
 											<Dropdown
 												value={lineTrack}
 												options={LINE_EDIT_TRACK_OPTIONS}
 												onChange={setLineTrack}
-												ariaLabel={ko("Joint whose path is edited", "궤적을 편집할 관절")}
+												ariaLabel={ko("Joint whose path is edited", "궤적을 편집할 관절", "要编辑轨迹的关节")}
 											/>
 										</Field>
 										{/* THE GESTURE SELECTOR. Pressing on the joint is how BOTH a
@@ -111,8 +111,8 @@ export default function PromptBlocksPanel({
 											onClick={() => setLinePinMode((on) => !on)}
 										>
 											{linePinMode
-												? ko("Pinning moments", "순간 찍는 중")
-												: ko("Pin a moment", "순간 찍기")}
+												? ko("Pinning moments", "순간 찍는 중", "正在钉住瞬间")
+												: ko("Pin a moment", "순간 찍기", "钉住一瞬")}
 										</button>
 										{linePinMode && (
 											<p className="inspector-hint">
@@ -122,7 +122,7 @@ export default function PromptBlocksPanel({
 														: `${linePins.length} pinned (max ${LINE_EDIT_PINS_MAX}) — frames ${linePins.map((pin) => pin.frame).join(", ")}. The model fills the movement between them`)
 													: ko(
 														"Scrub to a moment, then drag the green handle to where the joint should be. The take keeps its own timing; only that instant is pinned.",
-														"원하는 순간으로 재생 위치를 옮긴 뒤, 초록 손잡이를 관절이 있어야 할 자리로 끌어 주세요. 그 순간만 고정되고 나머지 타이밍은 그대로예요.",
+														"원하는 순간으로 재생 위치를 옮긴 뒤, 초록 손잡이를 관절이 있어야 할 자리로 끌어 주세요. 그 순간만 고정되고 나머지 타이밍은 그대로예요.", "拖到某一瞬间，再把绿色手柄拉到关节该在的位置。这条的时间不变，只钉住那一瞬。",
 													)}
 											</p>
 										)}
@@ -130,7 +130,7 @@ export default function PromptBlocksPanel({
 										    edit could borrow, so the whole clip is the default and
 										    these two numbers only ever NARROW it. endFrame is
 										    exclusive, like every other half-open range on this wire. */}
-										<Field label={ko("Frame range", "프레임 구간")}>
+										<Field label={ko("Frame range", "프레임 구간", "帧范围")}>
 											<div className="line-edit-range-row">
 												<input
 													type="number"
@@ -158,7 +158,7 @@ export default function PromptBlocksPanel({
 										{/* How far a pull carries along the path, in FRAMES — the
 										    sigma of the Gaussian falloff, said in the unit the user
 										    is looking at. Narrow is a beat, wide is a whole gesture. */}
-										<Field label={ko("Influence", "영향 범위")}>
+										<Field label={ko("Influence", "영향 범위", "影响范围")}>
 											<div className="line-edit-radius-row">
 												<input
 													type="range"
@@ -166,7 +166,7 @@ export default function PromptBlocksPanel({
 													max={DRAG_RADIUS_MAX}
 													step={1}
 													value={lineRadius}
-													aria-label={ko("How many frames a pull carries along the path", "잡아당길 때 궤적을 따라 함께 움직이는 프레임 수")}
+													aria-label={ko("How many frames a pull carries along the path", "잡아당길 때 궤적을 따라 함께 움직이는 프레임 수", "沿路径拉动时一起带走的帧数")}
 													onChange={(event) => changeLineRadius(event.target.value)}
 												/>
 												<span className="line-edit-radius-value">
@@ -181,7 +181,7 @@ export default function PromptBlocksPanel({
 													: `Frames ${lineEditFrom}–${lineEditTo} edited — ${lineCurvePointCount} points (max ${MAX_LINE_POINTS}); both ends ease out of the original path, so the seams do not pop. Pull it again, or draw over it, to refine`)
 												: ko(
 													"Draw along the path to reroute that section — the frames you drew over become the range, and the take's own timing is kept. Or grab a yellow dot and pull.",
-													"궤적을 따라 그리면 그 구간만 새로 지나갑니다 — 그린 만큼이 편집 구간이 되고, 원래 속도감은 그대로 유지돼요. 노란 점을 잡아 끌어도 됩니다.",
+													"궤적을 따라 그리면 그 구간만 새로 지나갑니다 — 그린 만큼이 편집 구간이 되고, 원래 속도감은 그대로 유지돼요. 노란 점을 잡아 끌어도 됩니다.", "沿路径重画这一段 — 画过的帧就是编辑范围，原来的时间感还在。也可以抓住黄点拉。",
 												)}
 										</p>
 										{/* The one thing users assume a modal viewport tool takes away.
@@ -201,11 +201,11 @@ export default function PromptBlocksPanel({
 											{lineCurveDirty
 												? ko(
 													"You can still orbit (Alt+drag), pan and fly freely — the edit survives it. It was aimed through one lens, so while the view is elsewhere the line is drawn ghosted and a new pull waits; Generate, undo and Reset work from anywhere.",
-													"시점은 자유롭게 돌리고(Alt+드래그) 옮길 수 있어요 — 편집은 그대로 남습니다. 다만 이 궤적은 처음 시점 기준이라, 시점을 옮기면 흐리게만 보이고 새로 끌기는 잠시 멈춰요. 생성·되돌리기·원래대로는 언제든 됩니다.",
+													"시점은 자유롭게 돌리고(Alt+드래그) 옮길 수 있어요 — 편집은 그대로 남습니다. 다만 이 궤적은 처음 시점 기준이라, 시점을 옮기면 흐리게만 보이고 새로 끌기는 잠시 멈춰요. 생성·되돌리기·원래대로는 언제든 됩니다.", "仍可环绕（Alt+拖）、平移和飞行 — 编辑不会丢。它是对着一个镜头做的，所以换视角时线会变淡，新的拉动会等着；生成、撤销和重置在哪都能用。",
 												)
 												: ko(
 													"You can still orbit (Alt+drag), pan and fly freely; the path follows the view until you pull or draw it.",
-													"시점은 평소처럼 자유롭게 돌리고(Alt+드래그) 옮길 수 있어요. 끌거나 그리기 전까지 궤적은 시점을 따라갑니다.",
+													"시점은 평소처럼 자유롭게 돌리고(Alt+드래그) 옮길 수 있어요. 끌거나 그리기 전까지 궤적은 시점을 따라갑니다.", "仍可环绕（Alt+拖）、平移和飞行；在你拉或画之前，路径会跟着视角。",
 												)}
 										</p>
 										{lineEditRange && lineEditRange.endFrame - lineEditRange.startFrame < MIN_CURVE_POINTS && (
@@ -230,14 +230,14 @@ export default function PromptBlocksPanel({
 										    is LOOKING at the viewport, and the answer arrives there. */}
 										{linePreviewBusy && (
 											<p className="inspector-hint line-preview-busy" aria-live="polite">
-												{ko("Previewing the pull…", "당긴 결과 미리보는 중…")}
+												{ko("Previewing the pull…", "당긴 결과 미리보는 중…", "正在预览拉动结果…")}
 											</p>
 										)}
 										{!linePreviewBusy && linePreviewUrl && (
 											<p className="inspector-hint line-preview-live">
 												{ko(
 													"The viewport is showing this edit at full quality — press Generate to keep it as the take.",
-													"뷰포트가 지금 이 편집의 최종 품질 결과예요 — 아래 생성을 누르면 테이크로 확정됩니다.",
+													"뷰포트가 지금 이 편집의 최종 품질 결과예요 — 아래 생성을 누르면 테이크로 확정됩니다.", "视口正在以最终质量显示这次编辑 — 按生成即可定成这一条。",
 												)}
 												{linePreviewMs > 0 && (
 													<span className="line-preview-time">
@@ -257,20 +257,20 @@ export default function PromptBlocksPanel({
 											type="button"
 											className="btn primary full generate"
 											disabled={!lineCurveDirty || generationBusy || bridgeChecking || bridge === null}
-											title={generationBusy ? ko("A generation is already running", "이미 생성이 돌고 있어요")
+											title={generationBusy ? ko("A generation is already running", "이미 생성이 돌고 있어요", "已经在生成了")
 												: !lineCurveDirty
-													? ko("Pull the path on the viewport first", "먼저 뷰포트에서 궤적을 잡아당겨 주세요")
+													? ko("Pull the path on the viewport first", "먼저 뷰포트에서 궤적을 잡아당겨 주세요", "请先在视口里拉动轨迹")
 													: motionReadinessMessage(lineReadinessState)}
 											onClick={runLineEdit}
 										>
-											{ko("Generate the line edit", "라인 편집 생성")}
+											{ko("Generate the line edit", "라인 편집 생성", "生成轨迹编辑")}
 										</button>
 										<MotionReadiness state={lineReadinessState} checking={bridgeChecking} onSetup={() => openMotionSetup("line")} onRetry={recheckMotionHealth} />
 										<button type="button" className="btn ghost full" disabled={!lineCurveDirty} onClick={resetLineCurve}>
-											{ko("Reset the curve", "원래대로")}
+											{ko("Reset the curve", "원래대로", "恢复原样")}
 										</button>
 										<button type="button" className="btn ghost full" onClick={exitLineEditMode}>
-											{ko("Exit line editing (Esc)", "라인 편집 끝내기 (Esc)")}
+											{ko("Exit line editing (Esc)", "라인 편집 끝내기 (Esc)", "结束轨迹编辑 (Esc)")}
 										</button>
 									</div>
 								)}
@@ -285,9 +285,9 @@ export default function PromptBlocksPanel({
 							type="button"
 							className="btn primary full generate prompt-block-generate"
 							disabled={generationBusy || bridgeChecking || bridge === null || !promptClips.some((clip) => clip.text.trim())}
-							title={generationBusy ? ko("A generation is already running", "이미 생성이 돌고 있어요")
+							title={generationBusy ? ko("A generation is already running", "이미 생성이 돌고 있어요", "已经在生成了")
 								: !promptClips.some((clip) => clip.text.trim())
-									? ko("Add a prompt block and describe its motion first", "프롬프트 블록을 추가하고 동작을 먼저 적어 주세요")
+									? ko("Add a prompt block and describe its motion first", "프롬프트 블록을 추가하고 동작을 먼저 적어 주세요", "请先加一块提示词，并写上动作")
 									: motionReadinessMessage(readinessState)}
 							onClick={() => runStudioAction("motion.generateAllBlocks")}
 						>
@@ -300,7 +300,7 @@ export default function PromptBlocksPanel({
 						)}
 						{ardyRunning && (
 							<button type="button" className="btn ghost full" onClick={cancelArdy}>
-								{ko("Cancel run", "실행 취소")}
+								{ko("Cancel run", "실행 취소", "取消运行")}
 							</button>
 						)}
 						{!lineEditMode && <MotionReadiness state={readinessState} checking={bridgeChecking} onSetup={openMotionSetup} onRetry={recheckMotionHealth} />}
