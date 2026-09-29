@@ -7,7 +7,7 @@ import { runInNewContext } from "node:vm";
 import * as THREE from "three";
 
 const source = readFileSync(new URL("../src/controls.jsx", import.meta.url), "utf8")
-	.replace(/^import .*;\n/gm, "")
+	.replace(/^import .*;\r?\n/gm, "")
 	.replace(/^export /gm, "");
 
 class Surface {
@@ -135,6 +135,33 @@ for (const [kind, button, altKey] of [["fly", 2, false], ["pan", 1, false], ["or
 	h.cleanup();
 	console.log("PASS active-hold Escape unlocks first, clears WASD, and the immediate next Escape exits");
 }
+
+{
+	// An idle Studio uses R3F's demand loop. Pointer-down's one frame can
+	// finish before W is pressed; the held key must wake and keep that loop
+	// alive without a timeline or another UI animation doing it for us.
+	const h = mount();
+	h.pointer("pointerdown");
+	h.grant();
+	h.flush();
+	const idleInvalidations = h.state.invalidations;
+	h.window.dispatchEvent({ type: "keydown", key: "w", code: "KeyW" });
+	h.flush();
+	assert.ok(h.state.invalidations > idleInvalidations, "W wakes the idle render loop while right is held");
+	const before = h.camera.position.clone();
+	const beforeFrameInvalidations = h.state.invalidations;
+	h.frame();
+	assert.ok(h.camera.position.distanceTo(before) > 0, "W moves the fly camera");
+	assert.ok(h.state.invalidations > beforeFrameInvalidations, "held W requests the next demand frame");
+	h.window.dispatchEvent({ type: "keyup", key: "w", code: "KeyW" });
+	const afterReleaseInvalidations = h.state.invalidations;
+	h.frame();
+	assert.equal(h.state.invalidations, afterReleaseInvalidations, "releasing W stops demand-frame requests");
+	h.pointer("pointerup");
+	h.cleanup();
+	console.log("PASS held WASD drives the idle demand renderer without another animation");
+}
+
 {
 	const h = mount();
 	h.pointer("pointerdown");

@@ -138,6 +138,10 @@ export function FlyControls({ enabled, cameraLocked = false, camRef, look, getPi
 			if (key) {
 				if (!keys.current.has(key) && key !== "shift") announceNav("walk", key);
 				keys.current.add(key);
+				// The Studio may be idle in demand-render mode. Pointer-down's
+				// one frame can finish before this key arrives, so wake the camera
+				// from the key itself rather than relying on another UI activity.
+				if (key !== "shift") scheduleInvalidate();
 				e.preventDefault();
 			}
 		};
@@ -369,7 +373,7 @@ export function FlyControls({ enabled, cameraLocked = false, camRef, look, getPi
 		cam.rotation.x = look.current.pitch;
 		cam.rotation.z = 0;
 
-		if (!enabled || keys.current.size === 0) return;
+		if (!enabled || !["w", "a", "s", "d", "q", "e"].some((key) => keys.current.has(key))) return;
 		const boost = keys.current.has("shift") ? BOOST : 1;
 		const step = MOVE_SPEED * speedScale.current * boost * Math.min(delta, 0.1);
 		// walking stays on the floor plane; Q/E is the crane
@@ -387,6 +391,9 @@ export function FlyControls({ enabled, cameraLocked = false, camRef, look, getPi
 			gesture.current.changed = true;
 			cameraChangeRef.current?.();
 		}
+		// Keep walking on the next demand frame even if the outer page does
+		// not switch its render loop to "always" while the key is held.
+		invalidate();
 	});
 
 	return null;
